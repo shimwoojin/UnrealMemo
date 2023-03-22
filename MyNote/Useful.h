@@ -22,4 +22,11 @@
  - BP_Character - Character Movement - Rotation Settings - Orient Rotation to Movement : 가속하고 있는 방향으로 캐릭터를 회전시켜주는 옵션,
 Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
  - BP_Player - SpringArm - Camera Settings - Use Pawn Controll Rotation : 이 옵션을 키게 되면 SpringArm이 Controller의 rotation값을 따라가게 됨
+
+ 9. 블프에서 노드에 Alt + G 누르면 함수 정의 볼 수 있음
+
+ 10. 블프 그래프에서 Ctrl + P 누르면 글로벌 에셋 들어가서 검색할 수 있음
+  - 번거롭게 콘텐츠 브라우저로 안 나가도 됨
+
+  
 */
