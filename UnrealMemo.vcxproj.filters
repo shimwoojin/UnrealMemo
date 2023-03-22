@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Text Include="Note_Tip\언리얼수업정리.txt" />
-    <Text Include="Note_Tip\unreal_tip.txt" />
+    <Text Include="TextFile\언리얼수업정리.txt" />
+    <Text Include="TextFile\unreal_tip.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\March\0302~0306.h" />
@@ -15,5 +15,6 @@
     <ClInclude Include="Class\March\0315.h" />
     <ClInclude Include="Class\March\0316.h" />
     <ClInclude Include="Class\March\0317.h" />
+    <ClInclude Include="MyNote\Useful.h" />
   </ItemGroup>
 </Project>

@@ -139,8 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="Note_Tip\unreal_tip.txt" />
-    <Text Include="Note_Tip\언리얼수업정리.txt" />
+    <Text Include="TextFile\unreal_tip.txt" />
+    <Text Include="TextFile\언리얼수업정리.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\March\0302~0306.h" />
@@ -153,6 +153,7 @@
     <ClInclude Include="Class\March\0315.h" />
     <ClInclude Include="Class\March\0316.h" />
     <ClInclude Include="Class\March\0317.h" />
+    <ClInclude Include="MyNote\Useful.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
