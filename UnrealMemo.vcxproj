@@ -142,6 +142,18 @@
     <Text Include="Note_Tip\unreal_tip.txt" />
     <Text Include="Note_Tip\언리얼수업정리.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Class\March\0302~0306.h" />
+    <ClInclude Include="Class\March\0307.h" />
+    <ClInclude Include="Class\March\0308.h" />
+    <ClInclude Include="Class\March\0309.h" />
+    <ClInclude Include="Class\March\0310.h" />
+    <ClInclude Include="Class\March\0313.h" />
+    <ClInclude Include="Class\March\0314.h" />
+    <ClInclude Include="Class\March\0315.h" />
+    <ClInclude Include="Class\March\0316.h" />
+    <ClInclude Include="Class\March\0317.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
