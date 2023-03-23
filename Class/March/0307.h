@@ -1,84 +1,84 @@
 #pragma once
 /*
-1. ¿¡¼Â ÃßÃâÇØ¿À´Â ¹æ¹ý
- - ÄÜÅÙÃ÷ ºê¶ó¿ìÀú -> Æú´õ È¤Àº ÆÄÀÏ¿¡ ¿ìÅ¬¸¯ -> ÀÌÁÖ
+1. ì—ì…‹ ì¶”ì¶œí•´ì˜¤ëŠ” ë°©ë²•
+ - ì½˜í…ì¸  ë¸Œë¼ìš°ì € -> í´ë” í˜¹ì€ íŒŒì¼ì— ìš°í´ë¦­ -> ì´ì£¼
 
-$ ÀÌÁÖ°¡ ¾Æ´Ñ Æú´õ ´ÜÀ§·Î º¹»ç¸¦ ÇÏ°Ô µÇ¸é ·¡ÆÛ·±½º °ü°è°¡ ±úÁú ¼ö ÀÖÀ½
+$ ì´ì£¼ê°€ ì•„ë‹Œ í´ë” ë‹¨ìœ„ë¡œ ë³µì‚¬ë¥¼ í•˜ê²Œ ë˜ë©´ ëž˜í¼ëŸ°ìŠ¤ ê´€ê³„ê°€ ê¹¨ì§ˆ ìˆ˜ ìžˆìŒ
 
-2. ¿ÍÀÌ¾î ÇÁ·¹ÀÓ
- - ºäÆ÷Æ®¿¡¼­ [¶óÀÌÆÃÆ÷ÇÔ]ÀÌ ±âº»°ª, [ºê·¯½Ã ¿ÍÀÌ¾îÇÁ·¹ÀÓ]Àº ¿ÍÀÌ¾î ÇÁ·¹ÀÓ ¸ðµå
+2. ì™€ì´ì–´ í”„ë ˆìž„
+ - ë·°í¬íŠ¸ì—ì„œ [ë¼ì´íŒ…í¬í•¨]ì´ ê¸°ë³¸ê°’, [ë¸ŒëŸ¬ì‹œ ì™€ì´ì–´í”„ë ˆìž„]ì€ ì™€ì´ì–´ í”„ë ˆìž„ ëª¨ë“œ
 
 
-3. »õ ·¹º§ ÀúÀå
- - <ÆÄÀÏ - »õ ·¹º§ - ¿øÇÏ´Â ·¹º§> ÈÄ Ctrl + s·Î ·¹º§À» ÀúÀå ÈÄ ÇÏ´Â °Ô ÁÁÀ½
+3. ìƒˆ ë ˆë²¨ ì €ìž¥
+ - <íŒŒì¼ - ìƒˆ ë ˆë²¨ - ì›í•˜ëŠ” ë ˆë²¨> í›„ Ctrl + së¡œ ë ˆë²¨ì„ ì €ìž¥ í›„ í•˜ëŠ” ê²Œ ì¢‹ìŒ
 
-4. ¿£Áø ÄÁÅÙÃ÷ °¡Á®¿À±â
- - ÄÜÅÙÃ÷ ºê¶ó¿ìÀú¿¡ ºä ¿É¼Ç -> ¿£Áø ÄÜÅÙÃ÷ Ç¥½Ã Ã¼Å© ÈÄ, ÇÊÅÍ ¿·¿¡ ¼Ò½º ÆÐ³ÎÀ» Ç¥½Ã ¿£Áø ÄÜÅÙÃ÷¿¡¼­ ¿øÇÏ´Â ¿¡¼Â ·¹º§·Î ²ø¾î¿À±â
- - °Ë»ö °¡´É
+4. ì—”ì§„ ì»¨í…ì¸  ê°€ì ¸ì˜¤ê¸°
+ - ì½˜í…ì¸  ë¸Œë¼ìš°ì €ì— ë·° ì˜µì…˜ -> ì—”ì§„ ì½˜í…ì¸  í‘œì‹œ ì²´í¬ í›„, í•„í„° ì˜†ì— ì†ŒìŠ¤ íŒ¨ë„ì„ í‘œì‹œ ì—”ì§„ ì½˜í…ì¸ ì—ì„œ ì›í•˜ëŠ” ì—ì…‹ ë ˆë²¨ë¡œ ëŒì–´ì˜¤ê¸°
+ - ê²€ìƒ‰ ê°€ëŠ¥
 
-5. ¾×ÅÍ ½ºÄÉÀÏ °°Àº ºñÀ²·Î Å°¿ì±â
- - ·¹º§ÀÇ ¾×ÅÍ Å¬¸¯ È¤Àº ¿ùµå ¾Æ¿ô¶óÀÌ³Ê¿¡¼­ Å¬¸¯ ÈÄ µðÅ×ÀÏ ÆÐ³Î¿¡¼­ Æ®·£½ºÆûÀÇ ½ºÄÉÀÏ¿¡ ÀÚ¹°¼è Àá±Ù ÈÄ ½ºÄÉÀÏÀ» ´Ã¸®°Å³ª ÁÙÀÌ°Ô µÇ¸é
- ¿ø·¡ °¡Áö°í ÀÖ´ø x,y,z ½ºÄÉÀÏÀÇ ºñÀ²¸¸Å­ µ¿½Ã¿¡ Á¶Á¤ °¡´É
+5. ì•¡í„° ìŠ¤ì¼€ì¼ ê°™ì€ ë¹„ìœ¨ë¡œ í‚¤ìš°ê¸°
+ - ë ˆë²¨ì˜ ì•¡í„° í´ë¦­ í˜¹ì€ ì›”ë“œ ì•„ì›ƒë¼ì´ë„ˆì—ì„œ í´ë¦­ í›„ ë””í…Œì¼ íŒ¨ë„ì—ì„œ íŠ¸ëžœìŠ¤í¼ì˜ ìŠ¤ì¼€ì¼ì— ìžë¬¼ì‡  ìž ê·¼ í›„ ìŠ¤ì¼€ì¼ì„ ëŠ˜ë¦¬ê±°ë‚˜ ì¤„ì´ê²Œ ë˜ë©´
+ ì›ëž˜ ê°€ì§€ê³  ìžˆë˜ x,y,z ìŠ¤ì¼€ì¼ì˜ ë¹„ìœ¨ë§Œí¼ ë™ì‹œì— ì¡°ì • ê°€ëŠ¥
 
-6. ¿ùµå¿¡ ¹èÄ¡µÈ ¾×ÅÍ ÀÌ¸§ ¹Ù²Ù´Â ´ÜÃàÅ°, F2
- - ¿ùµå ¾Æ¿ô¶óÀÌ³Ê¿¡¼­ ÀÌ¸§ ¹Ù²Ü ¾×ÅÍ ¿ìÅ¬¸¯ ÈÄ F2
+6. ì›”ë“œì— ë°°ì¹˜ëœ ì•¡í„° ì´ë¦„ ë°”ê¾¸ëŠ” ë‹¨ì¶•í‚¤, F2
+ - ì›”ë“œ ì•„ì›ƒë¼ì´ë„ˆì—ì„œ ì´ë¦„ ë°”ê¿€ ì•¡í„° ìš°í´ë¦­ í›„ F2
 
-7. ºí·çÇÁ¸°Æ® Å¬·¡½º´Â BP Á¢µÎ¾î
+7. ë¸”ë£¨í”„ë¦°íŠ¸ í´ëž˜ìŠ¤ëŠ” BP ì ‘ë‘ì–´
 
-8. Ä³¸¯ÅÍ ºí·çÇÁ¸°Æ® Å¬·¡½ºÀÇ ±âº» Æ÷ÇÔ ÄÄÆ÷³ÍÆ®
- - Ä¸½¶(ÄÝ¸®Àü), ¾Ö·Î¿ì, ¹«ºê¸ÕÆ®, ¸Å½¬
+8. ìºë¦­í„° ë¸”ë£¨í”„ë¦°íŠ¸ í´ëž˜ìŠ¤ì˜ ê¸°ë³¸ í¬í•¨ ì»´í¬ë„ŒíŠ¸
+ - ìº¡ìŠ(ì½œë¦¬ì „), ì• ë¡œìš°, ë¬´ë¸Œë¨¼íŠ¸, ë§¤ì‰¬
 
-9. ·ÎÄÃÃàÀº -> +x, È­¸é¿¡¼­ ³ª¿À´Â ¹æÇâ +y, ^¹æÇâ +z
- - mesh ÄÄÆ÷³ÍÆ®°¡ ¹Ù¶óº¸´Â ¹æÇâ°ú´Â ´Ù¸§, mesh°¡ ºÎ¸ð°¡ ¾Æ´Ô
+9. ë¡œì»¬ì¶•ì€ -> +x, í™”ë©´ì—ì„œ ë‚˜ì˜¤ëŠ” ë°©í–¥ +y, ^ë°©í–¥ +z
+ - mesh ì»´í¬ë„ŒíŠ¸ê°€ ë°”ë¼ë³´ëŠ” ë°©í–¥ê³¼ëŠ” ë‹¤ë¦„, meshê°€ ë¶€ëª¨ê°€ ì•„ë‹˜
 
-10. ¹«ºê¸ÕÆ®¿¡¼­´Â ¹°¸® °ü·Ã, Áß·Â Á¤Áö ¸¶Âû °è¼ö µî
+10. ë¬´ë¸Œë¨¼íŠ¸ì—ì„œëŠ” ë¬¼ë¦¬ ê´€ë ¨, ì¤‘ë ¥ ì •ì§€ ë§ˆì°° ê³„ìˆ˜ ë“±
 
-11. scene component¿Í actor componentÀÇ Â÷ÀÌ
- - actor´Â µ¥ÀÌÅÍ¸¦ ´Ù·ç´Â, sceneÀº Æ®·£½ºÆûÀÌ ÀÖÀ½
+11. scene componentì™€ actor componentì˜ ì°¨ì´
+ - actorëŠ” ë°ì´í„°ë¥¼ ë‹¤ë£¨ëŠ”, sceneì€ íŠ¸ëžœìŠ¤í¼ì´ ìžˆìŒ
 
-12. capsuleÀÌ ¾×ÅÍÀÇ ·çÆ® ÄÄÆ÷³ÍÆ®ÀÌ±â ¶§¹®¿¡ ·ÎÅ×ÀÌ¼ÇÀÌ¶û Æ®·£Áö¼Ç ¼³Á¤ÀÌ ¾È ¶¹À½
- - ÇÏÀ§ ÄÄÆ÷³ÍÆ®µéÀº ·çÆ®¿¡ ´ëÇØ »ó´ëÀûÀÎ Æ®·£½ºÆû
+12. capsuleì´ ì•¡í„°ì˜ ë£¨íŠ¸ ì»´í¬ë„ŒíŠ¸ì´ê¸° ë•Œë¬¸ì— ë¡œí…Œì´ì…˜ì´ëž‘ íŠ¸ëžœì§€ì…˜ ì„¤ì •ì´ ì•ˆ ë–´ìŒ
+ - í•˜ìœ„ ì»´í¬ë„ŒíŠ¸ë“¤ì€ ë£¨íŠ¸ì— ëŒ€í•´ ìƒëŒ€ì ì¸ íŠ¸ëžœìŠ¤í¼
 
-13. mesh component¿¡¼­ animation mode ¼³Á¤ °¡´É, ÈÄ¹Ý¿£ ÀÚÁÖ ¾²´Â °Ç ¾Æ´Ï¶ó ÇÔ
+13. mesh componentì—ì„œ animation mode ì„¤ì • ê°€ëŠ¥, í›„ë°˜ì—” ìžì£¼ ì“°ëŠ” ê±´ ì•„ë‹ˆë¼ í•¨
 
-14. game mode base¿¡¼­ ±âº» pawnÀÌ³ª ±âº» player controllerµî ¼³Á¤ °¡´É(Å¬·¡½º µðÆúÆ®)
- - ¸¸µç game mode base¿¡ ´ëÇØ¼­´Â ·¹º§¿¡ Àû¿ë È¤Àº ÇÁ·ÎÁ§Æ® ´ÜÀ§·Î Àû¿ëÇØÁÖ¾î¾ß ÇÔ
-  - ·¹º§ ´ÜÀ§´Â ¿ùµå¼¼ÆÃ¿¡¼­, ÇÁ·ÎÁ§Æ® ´ÜÀ§·Î´Â ÆíÁý - ÇÁ·ÎÁ§Æ® ¼¼ÆÃ - ¸Ê&¸ðµå - ±âº» °ÔÀÓ¸ðµå °ªÀ» ¹Ù²ãÁÖ¾î¾ß ÇÔ
+14. game mode baseì—ì„œ ê¸°ë³¸ pawnì´ë‚˜ ê¸°ë³¸ player controllerë“± ì„¤ì • ê°€ëŠ¥(í´ëž˜ìŠ¤ ë””í´íŠ¸)
+ - ë§Œë“  game mode baseì— ëŒ€í•´ì„œëŠ” ë ˆë²¨ì— ì ìš© í˜¹ì€ í”„ë¡œì íŠ¸ ë‹¨ìœ„ë¡œ ì ìš©í•´ì£¼ì–´ì•¼ í•¨
+  - ë ˆë²¨ ë‹¨ìœ„ëŠ” ì›”ë“œì„¸íŒ…ì—ì„œ, í”„ë¡œì íŠ¸ ë‹¨ìœ„ë¡œëŠ” íŽ¸ì§‘ - í”„ë¡œì íŠ¸ ì„¸íŒ… - ë§µ&ëª¨ë“œ - ê¸°ë³¸ ê²Œìž„ëª¨ë“œ ê°’ì„ ë°”ê¿”ì£¼ì–´ì•¼ í•¨
 
-15. ºùÀÇ Å»Ãâ ´ÜÃàÅ° F8
- - shift + F1 ÈÄ Å»Ãâ ´­·¯µµ µÊ
+15. ë¹™ì˜ íƒˆì¶œ ë‹¨ì¶•í‚¤ F8
+ - shift + F1 í›„ íƒˆì¶œ ëˆŒëŸ¬ë„ ë¨
 
-16. Ä³¸¯ÅÍ ¸ö ¼Ó¿¡¼­ ¸öÂÊÀÌ ºñ¾îº¸ÀÌ´Â ÀÌÀ¯´Â pipelineÀÇ rs´Ü°è¿¡¼­ backface cullingµÇ¾ú±â ¶§¹®
+16. ìºë¦­í„° ëª¸ ì†ì—ì„œ ëª¸ìª½ì´ ë¹„ì–´ë³´ì´ëŠ” ì´ìœ ëŠ” pipelineì˜ rsë‹¨ê³„ì—ì„œ backface cullingë˜ì—ˆê¸° ë•Œë¬¸
 
-17. gamemodebase¿¡¼­ ±âº» pawn ¼³Á¤ÇØÁÖ¾ú±â ¶§¹®¿¡ ·¹º§ playÇÏ°Ô µÇ¸é player startÁöÁ¡¿¡¼­ ¼³Á¤ÇØÁØ pawn ¸®½ºÆù ÇØÁÜ
- - pawnÀ» ·¹º§¿¡ ¹èÄ¡ÇÒ ÇÊ¿ä°¡ ¾ø´Ù´Â ¶æ, player start´Â ÇÊ¿ä
+17. gamemodebaseì—ì„œ ê¸°ë³¸ pawn ì„¤ì •í•´ì£¼ì—ˆê¸° ë•Œë¬¸ì— ë ˆë²¨ playí•˜ê²Œ ë˜ë©´ player startì§€ì ì—ì„œ ì„¤ì •í•´ì¤€ pawn ë¦¬ìŠ¤í° í•´ì¤Œ
+ - pawnì„ ë ˆë²¨ì— ë°°ì¹˜í•  í•„ìš”ê°€ ì—†ë‹¤ëŠ” ëœ», player startëŠ” í•„ìš”
 
-18. character¿¡¼­ monster¿Í player¸¦ »ó¼Ó½ÃÄÑÁÖ´Â ±¸Á¶·Î °¡±â ¶§¹®¿¡
- - mesh component¾Ö¼­ ¼³Á¤ÇÑ skeletal mesh¸¦ noneÀ¸·Î ÇØ¼­ ¹°·ÁÁÖ°í
- - ¼ø¼ö°¡»óÅ¬·¡½º·Î ¸¸µé¾îÁÖ´Â ¼¼ÆÃ±îÁö ÇØÁÜ(BP_CharacterÅ¬·¡½ºÀÇ Å¬·¡½º ¿É¼Ç¿¡¼­ Generate Abstract Class ¿É¼Ç ÄÑÁÜ, ¼ø¼ö°¡»óÅ¬·¡½ºÈ­)
- - CharacterÀÇ ÀÚ¼Õ Å¬·¡½º¸¦ ¸¸µé¶§´Â ÄÜÅÙÃ÷ ºê¶ó¿ìÀú¿¡¼­ ¿ìÅ¬¸¯ ÈÄ °¡´É
+18. characterì—ì„œ monsterì™€ playerë¥¼ ìƒì†ì‹œì¼œì£¼ëŠ” êµ¬ì¡°ë¡œ ê°€ê¸° ë•Œë¬¸ì—
+ - mesh componentì• ì„œ ì„¤ì •í•œ skeletal meshë¥¼ noneìœ¼ë¡œ í•´ì„œ ë¬¼ë ¤ì£¼ê³ 
+ - ìˆœìˆ˜ê°€ìƒí´ëž˜ìŠ¤ë¡œ ë§Œë“¤ì–´ì£¼ëŠ” ì„¸íŒ…ê¹Œì§€ í•´ì¤Œ(BP_Characterí´ëž˜ìŠ¤ì˜ í´ëž˜ìŠ¤ ì˜µì…˜ì—ì„œ Generate Abstract Class ì˜µì…˜ ì¼œì¤Œ, ìˆœìˆ˜ê°€ìƒí´ëž˜ìŠ¤í™”)
+ - Characterì˜ ìžì† í´ëž˜ìŠ¤ë¥¼ ë§Œë“¤ë•ŒëŠ” ì½˜í…ì¸  ë¸Œë¼ìš°ì €ì—ì„œ ìš°í´ë¦­ í›„ ê°€ëŠ¥
 
-19. 3ÀÎÄª ½ÃÁ¡À¸·Î º¸±â À§ÇØ BP_PlayerÅ¬·¡½º¿¡ camera component ´Þ¾ÆÁÜ
+19. 3ì¸ì¹­ ì‹œì ìœ¼ë¡œ ë³´ê¸° ìœ„í•´ BP_Playerí´ëž˜ìŠ¤ì— camera component ë‹¬ì•„ì¤Œ
 
-20. Å° ¼¼ÆÃÀº ÇÁ·ÎÁ§Æ® ¼¼ÆÃ - ¿£Áø ¹Ø¿¡ ÀÔ·Â¿¡¼­ ¼³Á¤
- - ¾×¼Ç ¸ÅÇÎ : ´­·¶´Ù°¡ ¶¼´Â°Å
- - Ãà ¸ÅÇÎ : ´©¸£°í ÀÖ´Â°Å (°£´ÜÇÑ ¼³¸íÀÎ µí)
+20. í‚¤ ì„¸íŒ…ì€ í”„ë¡œì íŠ¸ ì„¸íŒ… - ì—”ì§„ ë°‘ì— ìž…ë ¥ì—ì„œ ì„¤ì •
+ - ì•¡ì…˜ ë§¤í•‘ : ëˆŒë €ë‹¤ê°€ ë–¼ëŠ”ê±°
+ - ì¶• ë§¤í•‘ : ëˆ„ë¥´ê³  ìžˆëŠ”ê±° (ê°„ë‹¨í•œ ì„¤ëª…ì¸ ë“¯)
 
-21. ¹«½¼ Å°¸¦ ¾µÁö ½ÇÁ¦·Î ¼³Á¤ÇÒ ¶© °Ë»öÇØ¼­µµ °¡´ÉÇÏÁö¸¸ Å°ÀÚÆÇ ¸ð¾ç ´©¸£°í Å°º¸µå ÀÔ·ÂÀ¸·Îµµ ¼³Á¤ °¡´É
+21. ë¬´ìŠ¨ í‚¤ë¥¼ ì“¸ì§€ ì‹¤ì œë¡œ ì„¤ì •í•  ë• ê²€ìƒ‰í•´ì„œë„ ê°€ëŠ¥í•˜ì§€ë§Œ í‚¤ìžíŒ ëª¨ì–‘ ëˆ„ë¥´ê³  í‚¤ë³´ë“œ ìž…ë ¥ìœ¼ë¡œë„ ì„¤ì • ê°€ëŠ¥
 
-22. Å° ¸ÅÇÎÇÏ°í ³ª¸é ¾×ÅÍµéÀÇ ÀÌº¥Æ® ±×·¡ÇÁ¿¡¼­ ºí·çÇÁ¸°Æ® ¹èÄ¡ °¡´ÉÇÏ°Ô µÊ(Ãà ÀÌº¥Æ®, Ãà °ª ¾Æ´Ô)
+22. í‚¤ ë§¤í•‘í•˜ê³  ë‚˜ë©´ ì•¡í„°ë“¤ì˜ ì´ë²¤íŠ¸ ê·¸ëž˜í”„ì—ì„œ ë¸”ë£¨í”„ë¦°íŠ¸ ë°°ì¹˜ ê°€ëŠ¥í•˜ê²Œ ë¨(ì¶• ì´ë²¤íŠ¸, ì¶• ê°’ ì•„ë‹˜)
 
-23. player controller Å¬·¡½ºÀÇ ÀÌº¥Æ® ±×·¡ÇÁ¿¡¼­ getcontrolledpawn¿¡ ´ëÇÑ Å° ¼¼ÆÃÀ» ÇØÁà¾ß ÇÔ
+23. player controller í´ëž˜ìŠ¤ì˜ ì´ë²¤íŠ¸ ê·¸ëž˜í”„ì—ì„œ getcontrolledpawnì— ëŒ€í•œ í‚¤ ì„¸íŒ…ì„ í•´ì¤˜ì•¼ í•¨
 
-24. Æ¯Á¤ ³ëµå ¼±ÅÃ ÈÄ ctrl + w ³ëµå º¹Á¦
+24. íŠ¹ì • ë…¸ë“œ ì„ íƒ í›„ ctrl + w ë…¸ë“œ ë³µì œ
 
-25. add movement inputÀº pawnÀÇ ¸â¹öÇÔ¼ö
- - world ±âÁØ x, y, zÃàÀ¸·Î ÀÌµ¿ÀÌ °¡´ÉÇØ º¸ÀÓ
+25. add movement inputì€ pawnì˜ ë©¤ë²„í•¨ìˆ˜
+ - world ê¸°ì¤€ x, y, zì¶•ìœ¼ë¡œ ì´ë™ì´ ê°€ëŠ¥í•´ ë³´ìž„
 
-26. ¸¸µç player controller´Â gamemodebase¿¡ µî·ÏÇØÁÖ¾î¾ß ÇÔ
+26. ë§Œë“  player controllerëŠ” gamemodebaseì— ë“±ë¡í•´ì£¼ì–´ì•¼ í•¨
 
-27. ¸¶¿ì½º Å° ¸ÅÄªÀ» ÇÏ´Ùº¸´Ï Ãà ±âÁØÀ¸·Î È¸ÀüÀ» ÇØ¾ß ÇÏ´Âµ¥ ¾ð¸®¾ó ±âÁØÀ¸·Î
- - xÃàÀº ·Ñ, yÃàÀº ÇÇÄ¡, zÃàÀº ¿ä
- - ¸ð´ÏÅÍ ±âÁØ À§¾Æ·¡Ãà = ¿ä, ÁÂ¿ì Ãà = ÇÇÄ¡, µé¾î°¡°Å³ª ³ª¿À´Â ¹æÇâ = ·Ñ
- - ¿ä ÇÇÄ¡ ·Ñ ¼ø¼­´ë·Î À§, ¿ì, µéÀÌ¶ó »ý°¢
-*/
+27. ë§ˆìš°ìŠ¤ í‚¤ ë§¤ì¹­ì„ í•˜ë‹¤ë³´ë‹ˆ ì¶• ê¸°ì¤€ìœ¼ë¡œ íšŒì „ì„ í•´ì•¼ í•˜ëŠ”ë° ì–¸ë¦¬ì–¼ ê¸°ì¤€ìœ¼ë¡œ
+ - xì¶•ì€ ë¡¤, yì¶•ì€ í”¼ì¹˜, zì¶•ì€ ìš”
+ - ëª¨ë‹ˆí„° ê¸°ì¤€ ìœ„ì•„ëž˜ì¶• = ìš”, ì¢Œìš° ì¶• = í”¼ì¹˜, ë“¤ì–´ê°€ê±°ë‚˜ ë‚˜ì˜¤ëŠ” ë°©í–¥ = ë¡¤
+ - ìš” í”¼ì¹˜ ë¡¤ ìˆœì„œëŒ€ë¡œ ìœ„, ìš°, ë“¤ì´ë¼ ìƒê°
+*///**//
