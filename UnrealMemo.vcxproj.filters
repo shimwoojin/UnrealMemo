@@ -18,5 +18,6 @@
     <ClInclude Include="MyNote\Useful.h" />
     <ClInclude Include="Class\March\0321.h" />
     <ClInclude Include="Class\March\0322.h" />
+    <ClInclude Include="Class\March\0323.h" />
   </ItemGroup>
 </Project>
