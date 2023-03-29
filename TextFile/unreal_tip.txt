@@ -22,3 +22,7 @@
  - BP_Character - Character Movement - Rotation Settings - Orient Rotation to Movement : 가속하고 있는 방향으로 캐릭터를 회전시켜주는 옵션,
 Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
  - BP_Player - SpringArm - Camera Settings - Use Pawn Controll Rotation : 이 옵션을 키게 되면 SpringArm이 Controller의 rotation값을 따라가게 됨
+
+ 9. 이벤트 그래프는 하나 이상 더 만들어서 사용 가능함
+
+ 

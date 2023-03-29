@@ -714,49 +714,191 @@ for each loop를 통해 담아 놓은 모든 클래스들에 대해 spawn 시켜
 1. BP_Weapon이 Map으로 상태, 몽타주 정보를 갖고 있었는데 BP_Weapon은 추상클래스이기 때문에 구체화한 클래스인 BP_Sword에서
 	실제 정보를 갖고 있게 됨
 	
-	2. BlendSpace를 칼 든 버전으로 새로 만들었는데 Speed와 Direction을 각각 y,x축을 하여서 Idle에 대해서 8개, 걷기에 대해서 8개,
-	뛰기에 대해서 8개를 블렌드 스페이스에 알맞게 올려줌
-	- Direction은 언리얼의 yaw rotation이 왼쪽으로 -180, 오른쪽으로 180인 것을 활용
-	- snap to grid 옵션을 끄면 자유롭게 배치 가능
+2. BlendSpace를 칼 든 버전으로 새로 만들었는데 Speed와 Direction을 각각 y,x축을 하여서 Idle에 대해서 8개, 걷기에 대해서 8개,
+뛰기에 대해서 8개를 블렌드 스페이스에 알맞게 올려줌
+- Direction은 언리얼의 yaw rotation이 왼쪽으로 -180, 오른쪽으로 180인 것을 활용
+- snap to grid 옵션을 끄면 자유롭게 배치 가능
 
-	3. 만든 블렌드 스페이스를 ABP_Character에 가서 스테이트 머신에서 연결해주고 트랜지션 룰은 bArmed인 bool변수가 켜지고 꺼지고로 전환
-	- bArmed의 값을 매 프레임 업데이트 시켜주는데 ABP_Character의 이벤트 그래프에서 틱마다 업데이트하는 이벤트에서
-	TryGetPawnOwner에서 IsArmed로 핀을 뽑아오는데 이게 가능했던 것은 IsArmed가 BP_Character에서 정의한 인터페이스이기 때문
+3. 만든 블렌드 스페이스를 ABP_Character에 가서 스테이트 머신에서 연결해주고 트랜지션 룰은 bArmed인 bool변수가 켜지고 꺼지고로 전환
+- bArmed의 값을 매 프레임 업데이트 시켜주는데 ABP_Character의 이벤트 그래프에서 틱마다 업데이트하는 이벤트에서
+TryGetPawnOwner에서 IsArmed로 핀을 뽑아오는데 이게 가능했던 것은 IsArmed가 BP_Character에서 정의한 인터페이스이기 때문
 
-	4. 블렌드 스페이스가 애니메이션을 다르게 출력하는 변수로 Speed와 Direction을 줬는데 Speed는 CharacterMovement에서 쉽게 얻어올 수 있었지만
-	Direction은 우리가 계산해서 얻어와야 하는데 일단 ABP_Character의 이벤트 그래프에서 매틱마다 계산해야하는 게 맞음
-	- Calculate Direction이라는 함수가 있고
-	- BaseRotation에는 캐릭터의 Rotation이 아니라 컨트롤러의 Rotation을 줬음(캐릭터는 컨트롤러의 회전을 따라가기 때문)
-	- 회전은 Z회전만 줘야함
+4. 블렌드 스페이스가 애니메이션을 다르게 출력하는 변수로 Speed와 Direction을 줬는데 Speed는 CharacterMovement에서 쉽게 얻어올 수 있었지만
+Direction은 우리가 계산해서 얻어와야 하는데 일단 ABP_Character의 이벤트 그래프에서 매틱마다 계산해야하는 게 맞음
+- Calculate Direction이라는 함수가 있고
+- BaseRotation에는 캐릭터의 Rotation이 아니라 컨트롤러의 Rotation을 줬음(캐릭터는 컨트롤러의 회전을 따라가기 때문)
+- 회전은 Z회전만 줘야함
 
-	5. 검을 뽑을 때 미끄러지듯이 움직이면서 검 뽑는 모션을 고쳐보고자 함
-	- 몽타주 슬롯을 UpperBody, FullBody 2개로 만들어서 애니메이션 용도 별로 슬롯 지정
+5. 검을 뽑을 때 미끄러지듯이 움직이면서 검 뽑는 모션을 고쳐보고자 함
+- 몽타주 슬롯을 UpperBody, FullBody 2개로 만들어서 애니메이션 용도 별로 슬롯 지정
 
-	6. LayeredBlendPerBone 본마다레이어를블렌딩합니다 노드를 사용해서 UpperBody에 대해 사용해줄건데
-	- 어떤 Bone을 기준으로 블렌딩을 해줄건지 정해야하는데 스켈레톤 트리를 보면
-	- 골반과 상체로 나뉘고 상체에서 또 여러갈래로 나뉘는데 아무튼 spine_01을 기준으로 했음
+6. LayeredBlendPerBone 본마다레이어를블렌딩합니다 노드를 사용해서 UpperBody에 대해 사용해줄건데
+- 어떤 Bone을 기준으로 블렌딩을 해줄건지 정해야하는데 스켈레톤 트리를 보면
+- 골반과 상체로 나뉘고 상체에서 또 여러갈래로 나뉘는데 아무튼 spine_01을 기준으로 했음
 
-	7. Locomotion과 UpperBody슬롯을 Spine_01 Bone을 기준으로 블렌딩을 처리하는데 이 때 문제가 있음
-	- UpperBody슬롯에 있는 몽타주는 단발성이기 때문에 기본 동작이 있어야 했고
-	- 그래서 Locomotion에 대해 Cache를 만들어주어서 UpperBody의 기본 동작으로 줬음
+7. Locomotion과 UpperBody슬롯을 Spine_01 Bone을 기준으로 블렌딩을 처리하는데 이 때 문제가 있음
+- UpperBody슬롯에 있는 몽타주는 단발성이기 때문에 기본 동작이 있어야 했고
+- 그래서 Locomotion에 대해 Cache를 만들어주어서 UpperBody의 기본 동작으로 줬음
 
-	8. 이렇게까지 하고 나면 걷거나 뛰면서 칼을 뽑고 집어넣는 것까지 할 수 있었는데
-	- 검을 뽑거나 넣는 진행 동작중에 구르거나 백스텝을 해버리면 다시 할 수 없는 버그가 있었는데
-	- 이것의 이유는 검을 뽑거나 집어넣는 동작이 일단 Idle -> Arming으로 전환되고나서 진행이 되고
-	- Arming의 몽타주가 다 끝나고 나면 다시 Idle로 바뀌고
-	- 기본적으로 검을 뽑거나 넣는 건 Idle상태가 전제가 되어있기 때문에 그랬던 것
-	- 이에 대한 해결책으로 구르거나 백스텝도 Idle에서 시작할 수 있게 바꿔줘야 함
-	- 몽타주 재생 중에 방해받을 때에 대한 처리를 할 수 있는 노드도 있었지만 근본적으로 그게 해결책은 아님
-	- 근본적인 해결책이 아닌 이유는 구르기가 장비보다 우선순위가 높다면 그렇게 하는게 맞을 수 있지만 우리의 동작은
-	우선순위가 동등하고 독립적이기 때문에 이것은 안 됨
+8. 이렇게까지 하고 나면 걷거나 뛰면서 칼을 뽑고 집어넣는 것까지 할 수 있었는데
+- 검을 뽑거나 넣는 진행 동작중에 구르거나 백스텝을 해버리면 다시 할 수 없는 버그가 있었는데
+- 이것의 이유는 검을 뽑거나 집어넣는 동작이 일단 Idle -> Arming으로 전환되고나서 진행이 되고
+- Arming의 몽타주가 다 끝나고 나면 다시 Idle로 바뀌고
+- 기본적으로 검을 뽑거나 넣는 건 Idle상태가 전제가 되어있기 때문에 그랬던 것
+- 이에 대한 해결책으로 구르거나 백스텝도 Idle에서 시작할 수 있게 바꿔줘야 함
+- 몽타주 재생 중에 방해받을 때에 대한 처리를 할 수 있는 노드도 있었지만 근본적으로 그게 해결책은 아님
+- 근본적인 해결책이 아닌 이유는 구르기가 장비보다 우선순위가 높다면 그렇게 하는게 맞을 수 있지만 우리의 동작은
+우선순위가 동등하고 독립적이기 때문에 이것은 안 됨
 
-	9. Dodge쪽을 바꿔주는데 Idle일때만 동작할 수 있고 Idle->Dodging->Idle 이런식으로 상태를 변경시키면서 진행되어야 함
-	- Dodge자체 로직을 좀 바꾸는데 아무키도 안 눌리면 백스텝, 방향키가 같이 눌리면 그 방향으로 구르기
+9. Dodge쪽을 바꿔주는데 Idle일때만 동작할 수 있고 Idle->Dodging->Idle 이런식으로 상태를 변경시키면서 진행되어야 함
+- Dodge자체 로직을 좀 바꾸는데 아무키도 안 눌리면 백스텝, 방향키가 같이 눌리면 그 방향으로 구르기
 
-	10. 노드를 재구성하다보니 Dodging도 Roll과 BackStep에 대해서 데이터에셋을 만들고 이것의 인덱스를 구하는데 있어서
-	전에 썼던 것과 같은 로직을 쓰다보니 일단 이 로직에 대해서 공통으로 묶어주고 가야 함
-	- 함수 라이브러리를 만들어주었고
-	- 이것은 전역함수를 만든 것
-	- 매크로와의 차이는 매크로는 범위 지정이 있었지만 얘는 없었음
+10. 노드를 재구성하다보니 Dodging도 Roll과 BackStep에 대해서 데이터에셋을 만들고 이것의 인덱스를 구하는데 있어서
+전에 썼던 것과 같은 로직을 쓰다보니 일단 이 로직에 대해서 공통으로 묶어주고 가야 함
+- 함수 라이브러리를 만들어주었고
+- 이것은 전역함수를 만든 것
+- 매크로와의 차이는 매크로는 범위 지정이 있었지만 얘는 없었음
 
-	11. DataAsset의 GetMontageData에 대해서 함수 라이브러리에 새로 포장해서 새로운 함수 만들어줌
+11. DataAsset의 GetMontageData에 대해서 함수 라이브러리에 새로 포장해서 새로운 함수 만들어줌
+
+=======
+0327
+=======
+
+	1. Roll, BackStep을 입력이 없이 Dodge면 BackStep, 입력이 있으면서 Dodge이면 그 방향으로 Roll하게 만듬
+
+	2. UseControllerRotaionYaw 옵션을 풀어주어서 카메라 시점이랑 캐릭터 시점이랑 다르게 됐고 1번에서 PlayRotation을 돌려주기 때문에
+	UseControllerRotataionYaw 옵션이 묶여있으면 아마 동작 안 함
+
+	3. 무장상태일 때 애니메이션을 컨트롤러의 벡터와 input 벡터의 차이로 애니메이션을 다르게 작동했는데 2번에서 옵션을 건들고 나니깐
+	애니메이션에 문제가 생김
+	- 비무장일때는 이동방향으로 캐릭터가 회전하고 무장상태일 때는 그 옵션을 잠궈주는 식으로 세팅 할 예정
+
+	4. UseControllerRotationYaw는 꺼주고
+	OrientRotationToMovement는 비무장일때는 켜주고 무장일때는 꺼주고
+	UseControllerDesiredRotation은 켜주고
+	- 캐릭터가 회전 후 카메라의 묶인 시선으로 Add방식으로 돌아옴, UseControllerRotationYaw를 켜고 끄는 방식은 set방식이여서 탁 하고
+	화면전환되는 느낌일 것임
+
+	5. WeaponA이벤트 정의에서 SelectedWeapon을 비울 때 같은 노드를 2번 썼는데 이걸 앞에서 먼저 비우는 것은 불가능했음
+	- 직전에 SelectedWeapon의 값에 대해 비교를 하고 있기 때문
+
+	6. IsArmed에 대해 True이면 OrientRotationToMovement를 True로 False이면 False로 바꿔줌
+
+	7. 무기를 등에 붙이고 손에 붙이기 위해 변수를 2개 더 만들었음
+	- name 유형의 변수를 2개 만들어서 소켓의 name을 설정해 줌
+	- 블프 읽기 전용 변수로 바꿔줌(name같은 문자열에 대해 이 정도로 관리하는게 최선인 듯)
+
+	8. 무기를 장비하는 함수, 무기를 해제하는 함수를 각각 만듬
+	- AttachActorToComponent에 단지 socket을 바꿔주는 동작이지만 함수로 따로 관리
+
+	9. AttachActorToMesh를 만들고 Equip과 Unequip에 대해 앞에 만든 함수를 안에서 또 쓰는 식으로 만들어줌
+
+	10. WeaponA 이벤트 끝 부분에서 Equip과 Unequip 추가
+	- Unequip은 SelectedWeapon을 Unequip해주고 Equip은 끼려는 무기를 받아와서 껴줌, 이벤트 시작하자마자 인덱스 정하고 나온 배열에서 가져옴
+
+	11. UseControllerRotationYaw가 마이너한 옵션이긴 하지만 FPS 같은 게임에서 마우스 반응에 민감하면 쓰기도 한다고 함
+
+	12. 공격 모션을 추가하기 위해 한 작업들
+	- Action 1,2,3,4 Sequence들 몽타주로 만들어주고(폴더 위치 잡아주고)
+	- 슬롯 설정해주고(FullBody 슬롯)
+	- 액션 매핑해주고(마우스 왼 클릭)
+	- 인터페이스 함수 추가(ActionA)
+	- 몽타주 데이터 추가(데이터 에셋, Acting과 관련된 몽타주 세팅)
+	- Controller에서 이벤트와 메시지 이어주고
+	- Character에서 ActionA 구현해주고
+
+	13. ActionA를 구현하면서 ActionA가 동작하기 위해서 선행으로 처리할 작업들이 있다면
+	- IsArmed가 True인지
+	- State가 Idle인지(공격 가능 상태인지)
+	- State를 Acting으로 바꾸기까지
+
+	14. 공격이 성공하고 났는데 공격 모션에 공격이 성공하는게 아니라 overlap이벤트에 맞춰서 공격이 성공함
+	- NotifyState를 통해 해결 가능
+	- 이거 해결하는게 과제였음, BP_Weapon에서 bool변수 추가해서 해결
+
+	15. Notify 관련해서 추가 설명이 있었는데 기존에 쓰던 Notify는 스켈레톤 노티파이로 해당 스켈레톤에만 적용되어서
+	범용성이 떨어짐
+	- Notify 블프 클래스를 만들 수 있음
+
+	16. 기존 방식도 몽타주나 시퀀스 에디터에서 Notify이름 정할 수 있었고 이걸 PlayMontage쪽에서
+	- NotifyName 핀 뽑아서 이름에 대한 스위치를 통해 Notify 이름 정해준거에 대해선 이렇게 처리하겠다 라는 식의 처리가 가능
+	- 이름을 맞춰야 하는 것이 상당히 디메리트이기 때문에 이런 방식은 지양함, 그래서 notify 클래스를 만듬
+
+	17. noitfy클래스 만들고 나서 처리해줘야 하는 건 오버라이드 할 함수들이고
+	- 결국 이 클래스도 엔진의 클래스를 상속한 형태이기 때문에 상속한 변수 보기를 통해 어떤 변수를 들고 있는지 볼 수 있었음
+	예를 들면 NotifyName 같은 변수
+
+	18. 하지만 이 클래스도 결국 NotifyName을 직접 변수에서부터 설정하는 거라 애로함
+
+=======
+0328
+=======
+	1. 검의 유효한 공격판정을 만드는 과제가 있었는데
+	- 수업 파일 중에 노티파이가 2개 들어갔던 몽타주가 있었는데 이걸 통해서 알 수 있었던 점은
+	- Notify와 NotifyState의 차이를 대략 알 수 있었던 것이
+	- NotifyState의 NotifyBegin, NotifyEnd가 각각 계산되는 것
+	- Notify는 NotifyBegin만 있고 NotifyState는 NotifyBegin, NotifyEnd가 다 있음
+	- 몽타주 재생의 핀에서 NotifyBegin이 여러번 불릴 수 있고 NotifyEnd가 여러번 불릴 수 있음
+	- 그래서 몽타주 이름으로 빼서 Switch로 제어하는 방법도 있지만 후지다고 하고
+	- 몽타주 이름을 빼낼 떄 <클래스 디폴트 가져오기>에 클래스 이름을 줘서 NotifyName 빼낼 수도 있긴 함
+	- 그래서 NotifyState클래스 만들어서 NotifyBegin, NotifyEnd를 오버라이딩해서 쓰는 방법이 좋음
+	- 참고로 검 뽑는 모션이 잘 안됐던 이유가 NotifyBegin이 두번 작동해서 검은 잡자마자 놓는 식의 동작이여서 그랬음
+
+	2. 과제 풀이 내용
+	- BP_Weapon의 overlap 이벤트 발생할 수 있는지 여부를 껐다 켰다 하는 식으로 구현
+	- NotifyBegin에서 overlap 이벤트 키고 NotifyEnd에서 overlap 이벤트 끄고
+	- 이 과정에서 capsule에서 overlap 이벤트 껐다 켰다 할 수 있으니 이거 제어 할 수 있는 함수 만들어 주고
+	- 그 함수를 사용하는 다른 이름의 함수로 한 번 캡슐화해줌
+	- 결국에 흐름이 어떻게 되냐 했을 때
+	- NotifyState에서 오버라이딩 한 NotifyBegin, NotifyEnd에서 BP_Character의 Activate, Deactivate Attack 인터페이스를 콜하고
+	- BP_Character의 입장에선 현재 장비하고 있는 무기에 대한 동작이니깐 SelectedWeapon의 ActivateAttack을 켜주면 됨
+	- BP_Weapon의 ActivateAttack은 또 EnableCollision을 동작시키니깐 굉장히 캡슐화가 많이 되어 있음
+
+	3. 세팅하고 나서 실행해보니깐 안되던 이유중에
+	- 무기의 기본 overlap 이벤트 꺼놔야하고
+	- 노티파이가 실제로 몽타주에 배치되어야 작동함
+
+	4. 이벤트 그래프를 하나 이상 더 만들어서 사용 가능
+	- 공간이 다른거지 용도가 다른 게 아님
+	- 성격이 비슷한 이벤트끼리 모아두는 용도로 활용해볼만 함
+
+	5. Action 1,2,3,4에 대해서 마우스 좌클릭으로 깔끔하게 컨트롤 하는 법을 만들었는데
+	- 마우스를 연타하면 1,2,3,4 Action간에 전환이 부드러워야 하고
+	- 공격을 다시 할 때는 1번 Action부터 다시 나오고
+	- 연속 공격에 대해선 어느 시점에 클릭이 들어와야 연속공격으로 처리할 지(bAttackTransited)
+	- 선입력 방지를 위한(bAttackEnabled)
+
+	6. 몽타주에 노티파이를 2개 배치했는데
+	- BP_Weapon의 overlap을 켜는 노티파이
+	- BP_Character의 bAttackEnabled를 끄고 켜는 노티파이
+	- bAttackEnabled는 넉넉하게 주는 편이 좋음(범위를 좁게 주면 플레이어가 답답해 함)
+	- bAttackEnabled는 기본값 켜줘야 함
+
+	- 노티파이를 2개 이상 배치할 때 겹치게 되면 가시성이 안 좋기 때문에
+	- 노티파이 에디터 - 아래 화살표 - 노티파이 트랙 추가
+	
+	7. 연속동작을 부드럽게 만들어주기 위해 몽타주의 디테일 탭에서 BlendOut의 시간을 조정했는데
+	- 기본값이 보통 0.25였고 0.3초 ~ 1초 정도 값을 줬음
+	- 물론 애니메이션을 보고 직접 정해야하는 거임
+
+	- 블렌드 옵션중에 블렌드를 어떤 방식으로 할지를 정할 수도 있는데 기본값은 Linear, 선형보간임
+	- ctrl + alt 눌러서 그래프 볼 수 있음
+
+	8. ActionA의 흐름(최종이맞나?)을 좀 읽어보면
+	- bAttackEnabled이고 IsArmed여야 흐름에 들어올 수 있고
+	
+	- IsState가 Idle이면 Acting으로 바꾸고 몽타주 재생하는 흐름으로 들어감
+		- 몽타주 노티파이 중에 bAttackEnabled를 제어하는 노티파이가 있어서 그 노티파이의 begin~end중에는 공격 불가능
+		- 몽타주가 재생하면 기본적으로 몽타주 관리하는 index가 증가해서 다음 몽타주 준비
+		- 몽타주의 blendout은 completed에 도달할 수 없기 때문에 completed에서 index를 0으로 초기화 하는 건 몽타주가 온전히 재생 되었을 때임
+		- blendout하는 시점에도 bAttackTransited가 꺼져 있다면 다음 몽타주를 재생하지 않음(bAttackTransited가 켜지는 건 공격 중 bAttackEnabled가
+		켜져 있는 시점에 공격 키 입력이 들어와있고 연속 공격이 가능하게끔 노티파이를 설정해놓은 구간에서만 이 변수를 킬 수 있음)
+	
+	- IsState가 Idle이 아니면 bool변수 bAttackEnabled는 false, bAttackTransited는 true로
+		- 공격 중에 연속 공격을 가능하게 하는 흐름
+	
+	- 몽타주가 온전히 재생했다면
+		- index를 0으로 바꾸고
+		- bAttackEnabled를 true로 바꾸고
+		- State를 Idle로 초기화
