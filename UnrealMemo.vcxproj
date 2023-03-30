@@ -159,6 +159,7 @@
     <ClInclude Include="Class\March\0324.h" />
     <ClInclude Include="Class\March\0327.h" />
     <ClInclude Include="Class\March\0328.h" />
+    <ClInclude Include="Class\March\0329.h" />
     <ClInclude Include="MyNote\Useful.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
