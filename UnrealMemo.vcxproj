@@ -147,6 +147,7 @@
     <ClInclude Include="Class\April\0403.h" />
     <ClInclude Include="Class\April\0404.h" />
     <ClInclude Include="Class\April\0405.h" />
+    <ClInclude Include="Class\April\0406.h" />
     <ClInclude Include="Class\March\0302~0306.h" />
     <ClInclude Include="Class\March\0307.h" />
     <ClInclude Include="Class\March\0308.h" />
