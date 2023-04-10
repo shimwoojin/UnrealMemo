@@ -278,3 +278,11 @@
 	- pelvis에 1/4만큼의 블렌딩될 애니메이션이 적용되는 것
 	- -1은 해당 본 밑으로 적용 안 시켜줌
 	- 0은 해당 본에만 적용
+
+	16. HUD는 HeadUpDisplay의 약자로 플레이어의 전방에 정보를 표시해주는 역할을 하는데 예를 들어 유용한 쓰임새 중에
+	- FPS 혹은 TPS에 에임을 표시해준다던가 하는게 있음
+	- GameModeBase에서 내가 적용할 HUD 클래스를 세팅해줘야하고 블프 클래스를 만들 때 HUD 검색해서 클래스 만들 수 있고
+	- Reviece Draw HUD Event를 받아서 넘어오는 인자 SizeX, SizeY로 화면 크기를 알아내서 어디 위치에 어떤 크기로 HUD를 표시할지 정할 수 있음
+	- DrawMaterial에 ScreenX,Y가 Draw를 시작할 왼쪽은 x, 위쪽은 y 좌표를 받고 ScreenW, H를 통해 어떤 크기로 그릴지 정함
+
+	17. 
