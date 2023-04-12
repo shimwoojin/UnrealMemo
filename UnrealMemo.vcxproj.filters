@@ -31,5 +31,6 @@
     <ClInclude Include="Class\April\0405.h" />
     <ClInclude Include="Class\April\0406.h" />
     <ClInclude Include="Class\April\0407.h" />
+    <ClInclude Include="Class\April\0411.h" />
   </ItemGroup>
 </Project>
