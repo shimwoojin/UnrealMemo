@@ -32,5 +32,18 @@
     <ClInclude Include="Class\April\0406.h" />
     <ClInclude Include="Class\April\0407.h" />
     <ClInclude Include="Class\April\0411.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\0_BasicActivationOfCharacter.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\1_PlayerViewBlend.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\2_MakeActionForFarmerAndConstructor.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\3_EnemyAI.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\4_EnemyAnimationAndState.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\5_EnemySpawner.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\6_MapForFarmerAndConstructor.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\7_MainTower.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\8_MainTowerUIAndMainUI.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\9_CameraViewForEntire.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\10_DetailFor0to9.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\11_VarationOfRound.h" />
+    <ClInclude Include="MyNote\Portpolio\DADemo\12_HowToRoundChange.h" />
   </ItemGroup>
 </Project>
