@@ -45,5 +45,6 @@
     <ClInclude Include="MyNote\Portpolio\DADemo\10_DetailFor0to9.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\11_VarationOfRound.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\12_HowToRoundChange.h" />
+    <ClInclude Include="Class\April\0412.h" />
   </ItemGroup>
 </Project>
