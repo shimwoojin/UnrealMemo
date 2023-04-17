@@ -44,4 +44,11 @@
 	- Timeline의 핀에서 Finished와 Direction을 조합해서 처리하거나
 	- PlayfromStart, ReverseFromEnd 등의 핀으로 더 세밀한 조정 가능할 것 같긴 함
 
+	6. Fireball이 실제 날아가는 방법을 여러가지 방법이 있는데
+	- 투사체 속력이 빠르면 그냥 캠 위치에서 쏴버리는 경우가 있음
+	- fps에서도 대부분 캠 위치에서 쏴버리기도 하는데 총 위치에서 카메라가 가는 line을 따라 보간하는 방법도 있음
+	- 카메라 line의 중간에서부터 날아가는 경우도 있음
+	- linetrace에 걸리면 그냥 이미 맞아있고 파티클만 나가는 방식도 있음(스나이퍼)
+	
+	- fireball이 손에서 target까지 가는거랑 camera의 line을 따라가는 게 aim이 안 맞는 이유는 딱 한점에서만 맞기 때문임(taret으로 지정된 점에서만 맞음)
 */

@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="TextFile\4월_언리얼수업정리.txt" />
-    <Text Include="TextFile\unreal_tip.txt" />
     <Text Include="TextFile\3월_언리얼수업정리.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +152,7 @@
     <ClInclude Include="Class\April\0412.h" />
     <ClInclude Include="Class\April\0413.h" />
     <ClInclude Include="Class\April\0414.h" />
+    <ClInclude Include="Class\April\0417.h" />
     <ClInclude Include="Class\March\0302~0306.h" />
     <ClInclude Include="Class\March\0307.h" />
     <ClInclude Include="Class\March\0308.h" />

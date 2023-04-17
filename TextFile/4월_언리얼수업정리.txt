@@ -526,8 +526,8 @@
 	100, 30의 공간에서 내가 적용한 Image는 32 ,32 였는데 32, 32로 적용한 image가 100, 30의 공간에 맞춰 늘어났던 것으로 보임, SizeToContent를 true로 줌으로서
 	내가 적용한 image파일의 크기 32, 32로 적용된 것 같음(100, 30이라는 값을 오버라이딩 적용한 듯)
 
-	15. 에임을 화면의 정중앙을 주기 위해 1920 / 2, 1080 /2 한 값을 각각 X위치, Y위치에 주었는데 이것이 정확한 위치가 아닌 이유는
-	- 앵커가 좌측상단을 기준으로 되어 있었기 때문이고
+	15. 에임을 화면의 정중앙을 주기 위해 1920 / 2, 1080 /2 한 값을 각각 X위치, Y위치에 주었는데 이것이 정확한 위치가 아닌 이유는(allignment가 0.5, 0.5가 아니기 때문)
+	- 앵커가 좌측상단을 기준으로 되어 있었고
 	- 좌측 상단부터 출력되는 이미지를 화면의 x절반, y절반만큼씩 이동시킨 것이고
 	- Alignment가 0, 0이였는데 내 image의 좌측상단을 앵커에 맞춘다는 뜻이고 1,1은 우측 하단을 앵커에 맞춘다는 뜻임
 	- 앵커를 좌측상단에 주고 1920 / 2, 1080 / 2, Alignment는 0.5, 0.5로 원하는 세팅을 할 수 있었지만
@@ -536,3 +536,86 @@
 	
 	16. 수업 끝나기 직전에 review로 먼저 보여주셨는데
 	- 우리가 볼 수 없는 이유는 아직 WBP가 있긴 하지만 이 WBP를 적용해주겠다 라는 코드가 없기 때문임
+
+======
+0414
+======
+	1. WBP에 <디자이너>탭이 있고 <그래프>탭이 있는데 <디자이너>의 팔레트에 추가한 이미지, 버튼, 텍스트 등에 대해 변수로 만들 수 있었음
+	- 변수로 만들게 되면 <그래프>에서 다른 블프 클래스처럼 제어할 수 있는데(변수, 함수, 매크로, 이벤트 디스패처, 인터페이스, 이벤트)
+	- 이벤트에 대해선 construct, tick, 마우스 관련 이벤트까지 활용 할 수 있을 듯, overlap이나 hit같은 이벤트는 widget에 없는 듯
+
+	- 변수로 만들게 됐을 때 이 WBP를 소유하고 있을 Controller쪽에서 CrossHair 이미지를 게임 도중에 바꿀 수 있나 테스트를 해봤는데 가능함
+	- 이 WBP 클래스를 소유하고 있을 controller쪽에서 <UserWidget 오프젝트 래퍼런스>에 CastToWBP_Crosshair를 통해 변수나 함수에 직접적인 변경이 가능했고
+	- Cast하는 방식이 맘에 안 든다면 인터페이스도 상속이 가능한 것으로 확인 됨
+	- 런타임 중에 palette에 추가한 image 파일의 변경도 가능한 걸 확인했음(CrossHair - GetWidget - CastToWBP_CrossHair - CrossHair - SetBrushFromTexture)
+	- 형변환을 해야 하는 이유는 GetWidget의 return값이 UserWidget 오프젝트 래퍼런스 이기 때문(아마 Widget클래스의 최상위 부모 인듯)
+
+	2. UI도 성격에 따라 어디서 갖고 있을 지 고민을 좀 해봐야하는데
+	- 게임의 전체 KDA, 게임 시간, 게임 점수 등 전체적인 내용에 대해선 GameMode
+	- CrossHair, HP 게이지바, 궁극기 게이지 등 플레이하는 캐릭터가 바뀌어도 계속 화면에 띄워야 하는 내용은 Controller
+	- Player가 플레이하는 캐릭터가 바뀐다면 바뀌어야 할 내용은 Player
+
+	- 우리가 만든 CrossHair는 Controller에서 갖고 있을 예정
+
+	3. BP_PlayerController쪽에서 WidgetComponent를 추가해주고 WidgetComponent의 UserInterface - WidgetClass를 WBP_CrossHair로 줌으로서 우리가 사용할 위젯 클래스를 정함
+	- WidgetComponent - GetWidget - AddToViewport를 함으로서 우리가 만든 크로스헤어를 화면에 띄울 수 있었는데
+	- UserInterface - Space에서 Screen으로 세팅을 바꿔주었는데 World는 우리 화면이 아니라 월드에 인스턴스로 포함된 것처럼 취급하는 것 같음
+
+	- 의아했던 부분은 GetWidget을 통해 얻어온 점이고 이걸 보고 WidgetComponent라는 것이 WidgetClass를 포함하고 다른 추가적인 기능을 줄 수 있는 거라고 추측함
+	- 그래서 실험을 해봤는데
+	- 변수에 <UserWidget 클래스 래퍼런스>를 추가해서 BeingPlay에 CreateWidget을 통해 만들게 되면 component에서 GetWidget으로 얻어온 거랑 같은 효과더라
+	- 클래스 래퍼런스로 추가하기 전에 <UserWidget 오프젝트 레퍼런스>로 주어 직접 WBP_CrossHair를 물려주려고 했는데 이건 불가능 한 것 같음
+
+	4. 화면에 WBP_CrossHair를 띄울 수 있게 됐는데 ShowCrossHair, HideCrossHair를 통해 ZoomIn이 됐을 때만 이 위젯을 화면에 표시하게 바꿔주려면
+	- GetWidget - SetVisibility를 통해 제어가 가능함
+	- Controller 전용 인터페이스 하나 만들어서 ZoomIn, ZoomOut 함수 만들고
+	- ShowCrossHair은 SetVisibility를 NotHitTestable(Self&AllChildren)을 주고 HideCrossHair은 Collpased 옵션을 줌
+
+	- SetVisibility의 옵션 5가지 중
+
+	1) Visible : 표시o, 상호작용 가능
+	2) Collpased : 표시x, 공간 차지x 
+	3) Hidden : 표시x, 공간 차지 o -> 공간을 차지 한다는 것이 아마 Zorder가 높아서 화면에 표시될 우선순위가 높은 Widget을 Hidden으로 가려버리면 ZOrder가 상대적으로 낮은 UI를 가려버릴 수 있는 것 같음
+	이럴 때 Collpased 써서 다른 UI를 가리지 말아야 할 듯
+	4) NotHitTestable(Self&AllChildren) : 표시o, 상호작용 x
+	5) NotHitTestable(Self) : 4와 같지만 자식엔 적용x
+
+	5. 4에서 만든 ShowCrossHair, HideCrossHair를 TimeLine의 Start와 Reverse에 추가로 연결해 줌
+	- Timeline의 핀에서 Finished와 Direction을 조합해서 처리하거나
+	- PlayfromStart, ReverseFromEnd 등의 핀으로 더 세밀한 조정 가능할 것 같긴 함
+
+======
+0417
+======
+	1. SpringArm::TargetOffset, SpringArm::SocketOffset
+	- TargetOffset : RootComponent의 WorldLocation을 기준으로 World 상에서의 x,y,z를 더한 위치
+	- SocketOffset : RootComponent의 WorldLocation을 기준으로 Root의 Local 상에서의 x,y,z를 더한 위치
+
+	- 수업에서 Player를 world에 배치한 다음에 rotation을 살짝 돌려서 테스트했을 땐 티가 잘 안났는데
+	- rotation.x를 90 회전하거나 rotation.y를 -90 회전 후 targetoffset.z랑 socketoff.z를 바꿔보면 어떻게 다른지 알 수 있음
+
+	2. WidgetComponent가 갖고 있는 BeginOverlap, EndOverlap, Hit 이벤트 등은 어딘가에서 상속 받은 것이고 기능이 없는 것 같음(확실하지 않음)
+
+	3. Timeline의 Play, Reverse는 동영상 기준으로 pause 해놓은 부분부터 다시 시작하는 느낌이고 PlayFromStart, ReverseFromEnd는 무조건 시작 혹은 끝에서 부터 시작하는 핀
+	- Play, Reverse가 Stop핀에 의해 중간에 정지되는 경우가 있는데 정지된 시점부터 다시 Play 혹은 Reverse를 할 수 있는 것
+
+	4. 포폴 기획안 피드백 중에
+
+	레벨 전환(+CameraFade): 
+	- 레벨 전환 관련해서 OpenLevelByName 말고 OpenLevelByObjectReference을 통해 넘어가는 게 좋다고 하심(문자열 의존성 줄이기)
+	- 레벨이 전환되어서 PlayerStart에서 생성되는 내 pawn은 그 전 레벨의 정보가 모두 초기화 되는 것이고
+	- 그렇기 때문에 간단하게 쓸 수 있는 것이 GameInstance임(프로젝트 세팅에서 내가 만든 GameInstanceClass 설정해줘야 함)
+	- GameInstance란 싱글턴으로서 존재하고 전역변수를 담아두는 공간으로서 활용할 수 있음(Save & Load 대신 간단하게 처리하려면 고려해볼만 함, 프로젝트 규모가 커지면 곤란)
+	- 레벨 전환 간 탁 하고 카메라가 옮겨지는 것보단 scene이 fade되면서 openlevel에 필요한 시간도 벌고 부드러운 화면전환도 가능하게 해줄 수 있음
+	- 이 때 사용한 함수가 StartCameraFade였고 FromAlpha가 0, ToAlpha가 1이면 화면이 어두워지는 효과, FromAlpha가 1, ToAlpha가 0이면 밝아지는 효과를 줄 수 있고
+	- Duration만큼 Delay를 걸어준 다음 OpenLevel을 해주면 됨
+	- open된 level쪽에선 레벨 블프에서 beginplay에서 어두웠다가 밝아지는 효과를 주면 됨(level 블프마다 이 작업을 해야하는 게 단점)
+
+	Spawner :
+	- Map 사용하지 말고 Class 디폴트를 얻어와서 직접 변수에 접근 가능함(spawn할 몬스터의 클래스에 접근해서 미리 지정해 둔 얼마나 자주 spawn할지의 float변수(SpawnTime)를 얻어 옴)
+
+	무기의 파티클 위치 : 
+	- 바꿀 필요 있음
+
+	Homing하는 스킬 :
+	- GetAllActorsWithTag -> SphereOerlapActors 함수로 대체(전자의 함수는 비싸다고 함)
