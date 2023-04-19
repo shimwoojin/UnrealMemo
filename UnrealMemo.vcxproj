@@ -143,6 +143,7 @@
     <Text Include="TextFile\3월_언리얼수업정리.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Class\April\0418.h" />
     <ClInclude Include="Class\April\0403.h" />
     <ClInclude Include="Class\April\0404.h" />
     <ClInclude Include="Class\April\0405.h" />
