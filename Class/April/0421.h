@@ -1,7 +1,7 @@
 #pragma once
 /*
 	1. 체력 게이지를 적의 머리위에 띄워주기 위해 만들어 둔 WBP_Gauge를 적용시켜주어야 하는데
-	- Characte 혹은 Enemy에 WidgetComponent를 추가하고
+	- Character 혹은 Enemy에 WidgetComponent를 추가하고
 	- 위젯 클래스를 WBP_Gauge를 적용해주고
 	- World가 아닌 Screen으로 바꾸고(World일 경우 백페이스 컬링되어 안 나오는 방향이 있음)
 	- 원하는 사이즈에서 드로를 해주고(체크 안하면 WBP_Gauge를 우리가 만들어 둔 크기가 아니라 컴포넌트에서 정한 크기로 드로우 됨)
@@ -27,7 +27,7 @@
 	- RGBA 각각에 대해서 각 채널 당 8비트 씩 주어서 0 ~ 255의 정수로 표현하건 채널 당 10비트 씩 주어서 0 ~ 1023의 정수로 표현하건
 	빨강, 파랑, 초록의 최대 농도(?), 진하기(?)는 255에서 1023에서 같아야 하기 때문에 이 비율을 표현한 게 linearcolor
 
-	- BPC : BitPerChanel, R,G,B,A를 각각 한 채널로서. A가 Color이기 때문에 BitPerColor는 정확하게는 맞는 말이 아님
+	- BPC : BitPerChanel, R,G,B,A를 각각 한 채널로서. A가 Color가 아니기 때문에 BitPerColor는 정확하게는 맞는 말이 아님
 	- BPP : BitPerPixel, R,G,B의 채널을 더한 총 비트 수. Alpha는 포함되지 않음
 
 	7. 위젯을 컴포넌트로 쓰다 보면 항상 GetWidget 혹은 GetUserWidgetObject로 실제 위젯 클래스 불러오는 거 잊지 말기
