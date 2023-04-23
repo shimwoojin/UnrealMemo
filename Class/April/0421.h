@@ -42,4 +42,5 @@
 	9. 끝날 때 문제가 있는데
 	- 화면 좌상단에 플레이어 게이지는 WBP_PlayerGauge로서 뜨는데(Player에서 WBP_PlayerGauge를 쓰고 AddToViewport까지 해줌)
 	- 플레이어 머리 위에도 게이지가 뜸(다음 시간에 해결해보기로)
+	- WidgetComponent의 HiddenInGame을 키면 해결되긴 함
 */
