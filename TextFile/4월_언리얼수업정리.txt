@@ -619,3 +619,100 @@
 
 	Homing하는 스킬 :
 	- GetAllActorsWithTag -> SphereOerlapActors 함수로 대체(전자의 함수는 비싸다고 함)
+
+======
+0418
+======
+	1. GameInstance는 프로젝트&세팅 -> 맵&모드에서 세팅해서 사용
+	- GetGameInstance를 통해 얻어오고(캐스팅 필요하니 형변환을 해놓은 함수를 만들어서 return해서 쓰면 편함)
+	- GameInstance는 싱글턴으로서 존재하는 걸 개인이 쓰기 나름(데이터 보관용도 나쁘진 않아보임)
+
+	2. HP Bar를 만들기 위해 WBP를 만들고 Canvas 패널 지워주고 SizeBox를 추가해줌(SizeBox는 자식을 하나만 가질 수 있다고 하심)
+	- Canvas 패널은 화면 전체, SizeBox는 일정 크기를 가지는 패널(w : 125, h : 25)
+	- Border 자식으로 추가
+	- Border에 패딩이 2종류가 있는데 부모인 SizeBox에 대한 패딩일지 Border 내부 content에 대한 패딩일지(우리는 content에 대해 전체 5 줌)
+	- border의 색상은 회색 줌(r,g,b 0.25씩)
+	- ProgressBar도 자식에 추가
+
+	3. SizeBox - Border - ProgressBar 순으로 사용
+	- ProgressBar는 0 ~ 1 사이의 비율(Percent 옵션)로 부모에 대해 공간을 얼마나 차지할 지 정하는 듯
+	- LeftToRight, RightToLeft 등 어디서부터 게이지를 채워서 보여줄 지 정할 수 있음(Bar Fill Type)
+
+=======
+0421
+=======
+	1. 체력 게이지를 적의 머리위에 띄워주기 위해 만들어 둔 WBP_Gauge를 적용시켜주어야 하는데
+	- Character 혹은 Enemy에 WidgetComponent를 추가하고
+	- 위젯 클래스를 WBP_Gauge를 적용해주고
+	- World가 아닌 Screen으로 바꾸고(World일 경우 백페이스 컬링되어 안 나오는 방향이 있음)
+	- 원하는 사이즈에서 드로를 해주고(체크 안하면 WBP_Gauge를 우리가 만들어 둔 크기가 아니라 컴포넌트에서 정한 크기로 드로우 됨)
+	- AddToViewPort는 하지 않으면 적용 됨(캔버스 패널이 아니라 SizeBox라 그런가 ?)
+
+	2. 체력 게이지는 체력이 변하면 업데이트 되어야 하기 때문에
+	- WBP_Gauge의 ProgressBar의 Percent 값을 체력이 변하는 순간 업데이트 해주어야 함
+	- 체력 게이지의 소유주에게서 LifeNow / LifeMax 한 값을 Progress의 Percent에 적용해야 함
+	- WBP_Gauge에서 함수로 만들어서 형변환해서 AnyDamage에서 처리할 수도 있지만 인터페이스를 사용하여 구성
+
+	- 사실 AnyDamage에서만 처리하긴 하는데 체력을 회복한다던가 최대체력이 변한다던가 하는 곳에선 항상 체력게이지를 업데이트 하는 코드가 있어야 하는데
+	이 방법은 조금 맘에 안 들지도
+
+	3. 위젯은 상속은 안 되고 다른 위젯의 부품으로서 들어갈 순 있음
+	- 부품으로서 들어가는 건 위젯의 <사용자 생성> 탭
+
+	4. character의 skeletalmesh, collision 등은 바꿀 수 없음
+	- cpp에서는 가능하다고 함
+
+	5. 형변환 대신 인터페이스로 SetGaugeRatio, SetGaugeColor를 구성하는 건 너무 많이했으니 패스
+	
+	6. LinearColor는 0 ~ 1 사이의 비율로 표현한 색
+	- RGBA 각각에 대해서 각 채널 당 8비트 씩 주어서 0 ~ 255의 정수로 표현하건 채널 당 10비트 씩 주어서 0 ~ 1023의 정수로 표현하건
+	빨강, 파랑, 초록의 최대 농도(?), 진하기(?)는 255에서 1023에서 같아야 하기 때문에 이 비율을 표현한 게 linearcolor
+
+	- BPC : BitPerChanel, R,G,B,A를 각각 한 채널로서. A가 Color가 아니기 때문에 BitPerColor는 정확하게는 맞는 말이 아님
+	- BPP : BitPerPixel, R,G,B의 채널을 더한 총 비트 수. Alpha는 포함되지 않음
+
+	7. 위젯을 컴포넌트로 쓰다 보면 항상 GetWidget 혹은 GetUserWidgetObject로 실제 위젯 클래스 불러오는 거 잊지 말기
+	- 특히 인터페이스까지 쓰니깐 WidgetComponent에 인터페이스콜을 해도 오류없이 작동을 안 하니 어디서 잘못된지 알 수가 없음
+
+	8. 적은 머리위에 gauge를 머리위에 띄우지만 플레이어는 playergauge를 따로 만들어서 처리할건데
+	- 일단 이런 거 처리하기 전에 같은 내용인데 2개 만들어야 하나 생각해보면
+	- 이번 케이스는 그래야 할 듯
+	- SizeBox로서 인스턴스 위에 존재하는 위젯이 아니라 우리 화면에 꽉 채워서 고정될 UI로 존재할 거기 때문에
+	- 캔버스 패널에 다시 적용해주어야 함(만들어 둔 WBP_Gauge는 <사용자 생성> 탭에서 재활용)
+
+	9. 끝날 때 문제가 있는데
+	- 화면 좌상단에 플레이어 게이지는 WBP_PlayerGauge로서 뜨는데(Player에서 WBP_PlayerGauge를 쓰고 AddToViewport까지 해줌)
+	- 플레이어 머리 위에도 게이지가 뜸(다음 시간에 해결해보기로)
+	- WidgetComponent의 HiddenInGame을 키면 해결되긴 함
+
+======
+0425
+======
+	1. 포폴 피드백 중에 데이터를 전달하는 방식에는 2가지가 있다고 하심 1) Get으로 받거나 2) Set으로 세팅하거나
+	- 예를 들면 Character와 연관된 값이 Weapon의 i라고 하면 이걸 처리하는 곳이 1) Weapon에서 Character를 getter로 얻어와서 처리하거나 2) Character에서 Weapon에 대해 set을 하거나
+	- 누구한테 이 정보가 있는 게 적합한지를 잘 판단하길
+	- 이거에 또 적합한 예로 애님 블프에서 IsArmed를 Tick마다 확인하는 게 아니라 Character가 무기 바꿀 때 애님 블프에 알려주는 게 맞는 것
+
+	2. Widget은 Component로 다루게 되면 Ingame내에 Transform을 가져야 하는 경우 사용하고 아닌 경우 변수로서 CreateWidget, AddToViewport로 다루는 게 더 적합
+	- CrossHair : 변수로 CreateWidget, AddToViewPort
+	- Enemy의 체력바 : Widget Component
+	- Player의 체력바 : 변수로 CreateWidget, AddToViewPort
+
+	- 처음에 Component로서 PlayerController에서 Crosshair가 정상 작동한 이유는 controller가 default로 hiddeningame이기 때문에 월드상에서 component로서 작용이 안 된 것 뿐.
+	Component로 widget을 사용해도 AddToViewport를 하게 되면 변수로 쓰는 것과 별 차이가 없음
+	- 2D상 화면에 표시하기 위해서 Component로 추가해서 HiddenInGame걸어주고 AddToViewport해도 되긴 하나 쓰임새에 맞게 변수로 쓰는 쪽으로,,
+	
+	3. CreateWidget의 OwningPlayer는 핀을 안 주면 GameMode에서 걸어준 default controller를 갖게 됨
+
+	4. 체력 게이지의 경우 체력이 변하면 게이지도 변하는 코드가 항상 추가되어야 하기 때문에 체력이 변하는 setter 혹은 add, sub를 하는 코드에 게이지를 업데이트 하는 함수로 같이 처리하는 게 효율상 좋음
+	- 또한 이런 케이스가 있기 때문에 만들어진 setter혹은 getter가 있다면 그것을 사용하여 처리하는 것이 맞음
+
+	5. Character에서 SetLifeNow라는 함수로 처리하는 부분이 있고
+	- SetLifeNow에 대해서 Enemy, Player에서 각각 오버라이딩 했기 때문에
+	- Enemy, Player는 각각 자기의 widget에 맞는 처리가 들어가게 됨(굉장히 강력한 듯), Character에선 Beginplay랑 AnyDamage에서 1번씩 SetLifeNow 호출
+
+	6. 블프 setter는 처리하고 나온 값에 대해서 return 해주는 경우가 대부분 인 듯
+
+	7. WBP_Gauge에서 인터페이스 정의한(SetGaugeColor, SetGaugeRatio)는 WBP_PlayerGauge에서 또 인터페이스 상속해주고 새로 정의해야하는데
+	- WBP_PlayerGauge 내에서 WBP_Gauge를 <사용자 생성> 탭에서 재활용하고 있기 때문에 
+	WBP_PlayerGauge의 변수인 WBP_Gauge의 인터페이스 함수를 콜해서 WBP_PlayerGauge를 재정의하면 유연하게 같은 기능을 가진 인터페이스 함수 구성 가능

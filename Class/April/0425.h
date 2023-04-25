@@ -11,7 +11,7 @@
 	- Player의 체력바 : 변수로 CreateWidget, AddToViewPort
 
 	- 처음에 Component로서 PlayerController에서 Crosshair가 정상 작동한 이유는 controller가 default로 hiddeningame이기 때문에 월드상에서 component로서 작용이 안 된 것 뿐.
-	Component로 widget을 사용해도 AddToViewport를 하게 되면 변수로 쓰는 것과 별 차이가 업음
+	Component로 widget을 사용해도 AddToViewport를 하게 되면 변수로 쓰는 것과 별 차이가 없음
 	- 2D상 화면에 표시하기 위해서 Component로 추가해서 HiddenInGame걸어주고 AddToViewport해도 되긴 하나 쓰임새에 맞게 변수로 쓰는 쪽으로,,
 	
 	3. CreateWidget의 OwningPlayer는 핀을 안 주면 GameMode에서 걸어준 default controller를 갖게 됨
