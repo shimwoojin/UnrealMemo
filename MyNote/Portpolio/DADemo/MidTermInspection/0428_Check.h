@@ -78,7 +78,7 @@
 
 		2.6) Damage를 줄 수 있는 개체들의 상속용 인터페이스(Skill, Weapon, Enemy)
 			2.6.1) BPI_Damage
-				- DamageType WhatDamageType() : DamageType 열거형 반환(이 인터페이스를 상속받은 클래스들은 DamageType이라는 열거형을 가짐, 누구에게 데미지를 줄 수 있는지를 위한 열거형)
+				- Integer WhatDamageType() : DamageType Integer 반환(이 인터페이스를 상속받은 클래스들은 DamageType이라는 Bitmask Integer를 가짐, 누구에게 데미지를 줄 수 있는지를 위한 변수)
 				- bool WhoCanDamage(DamageType) : AnyDamage를 처리하는 actor들에서 call할 인터페이스, 나에게 damage를 줄 수 있는 DamageType인 경우만 damage를 입는 방식으로 처리
 				- Actor GetTargetActor() : Target을 정하고 damage를 주는 행동이 있다면 target 반환(ex. Homing)
 
@@ -97,6 +97,46 @@
 				- void SetMoney(Integer64) : 상점 UI의 Money 표시용
 
 		2.8) 상호작용이 가능한 actor들 상속용 인터페이스(필요하다면 추가)
+
+	3. 통신
+		3.1) Player와 통신
+			3.1.1) Player와 Skill, Weapon의 관계
+				- Player는 BeginPlay에서 Weapon들을 spawn 후 가지고 있음(Attacker는 2종류, Constructor는 1종류, Farmer는 1종류)
+				- Weapon의 Owner는 Player, Instigator는 Player
+				
+				- Weapon은 BeginPlayer에서 Skill들을 spawn 후 가지고 있음(무기마다 스킬 2종류(E,R))
+				- Skill의 Owner는 Player, Instigator는 Player
+
+				- Skill이 spawn하는 투사체 혹은 actor가 있는데
+				- spawn된 개체의 Owner는 Skill, Instigator는 Player
+
+			3.1.2) Player와 PlayerController, UI의 관계
+				- Constructor와 Farmer는 Controller에서 Spawn
+				- Attacker, Consructor, Farmer인 Player 3종류는 Controller가 배열에 보관하여 알고 있음
+				- Player전용 UI는 PlayerController가 알고 있음
+				- 화면에 체력 게이지나 스킬 Image, 스킬 Cooltime등을 표시하기 위해 하는 처리들은 Controller에서 담당(Controller가 UI도 알고 있고 현재 Play 중인 Player도 알고 있기 때문)
+
+			3.1.3) Constructor의 스킬 매커니즘
+				- Constructor는 E 혹은 R 발동 시 TowerMaker를 상속받은 Class를 Spawn하게 됨
+				- TowerMaker는 체력을 가졌고 Constructor의 기본 평타(좌클릭)만 TowerMaker에 데미지를 줄 수 있으며
+				- 체력이 0이하가 되면 TowerMaker는 Tower Class를 Spawn하고 소멸
+
+
+
+			 Spawn한 Enemy들에 접근해야 할 때
+				- Spawner에서 Spawn 후 Spawn한 Enemy들에 대해 배열에 저장
+				- Spawner는 GameInstance에 등록(이렇게 하면 Spawn한 Enemy들에 대해 전역에서 접근 가능
+
+
+
+
+
+
+
+
+
+
+=====================================================================================
 			
 	3. 클래스마다 특이사항 설명(변수, 함수 위주로)
 		3.1) BP_Character
@@ -117,7 +157,7 @@
 				- void SetLifeNow()
 				- void SetLifeMax()
 				
-			3.1.3) 인터페이스 실제 구현
+			3.1.3) 인터페이스 구현
 				- BeginPlay, CollisionOn/Off, AnyDamage(공용 데미지 처리, 하위 클래스들은 Damage 인터페이스의 WhoCanDamage로 DamageType 확인 후 Damage 처리), SetState
 
 		3.2) BP_Player
@@ -127,13 +167,38 @@
 				- BP_Weapon* Weapons : Weapon 실제 주소를 담은 배열
 				- CurrentWepaon
 
-			3.2.2) 인터페이스 실제 구현
+			3.2.2) 인터페이스 구현
 				- BeginPlay, ControlOn/Off, Run, Jumping, Tick, ZoomIn/Out, AnyDamage, En/DisableAttack, De/ActivateAttack, SetCurrentWeaponHiddenInGame, SwapWeapon, Skill, Action1
 
 		3.3) BP_Enemy
 			3.3.1) 변수
-			- float RunSpeed
-			- float WalkSpeed
-			- float SpawnPerTime : Spawn 주기
-			- E_DamageType DamageType
+				- Float RunSpeed
+				- Float WalkSpeed
+				- Float SpawnPerTime : Spawn 주기
+				- Integer DamageType(Bitmask)
+
+			3.3.2) 함수
+				- bool IsEnemy() (인터페이스 오버라이드, enemy를 상속받았는지 확인)
+				- void SetLifeNow(float) : lifenow 변경 및 체력 표시용 gauge 변경
+				- void SetLifeMax(float) : lifemax  변경 및 체력 표시용 gauge 변경
+				- void SetLifeGaugePercent() : lifenow, lifemax 변경 시 실행 할 내부용 함수(private)
+
+			3.3.3) 인터페이스 구현
+				- SetWalkSpeed, SetRunSpeed,AnyDamage
+
+		3.4) BP_Weapon
+			3.4.1) 변수
+				- Float Damage
+				- Name SockOnEquipped
+				- Name SockOnUnequipped
+				- Name SocketOnTrailStarted
+				- Name SocketOnTrailEnded
+				- Map<E_CharacterState, MontageDataAsset> MontageDataMap
+				- BP_Skill*(class) SkillClasses
+				- BP_Skill* Skills
+				- Integer DamageType : 누구에게 Damage를 줄지 정하는 Bitmask
+				- Texture2D UIImage : PlayerUI용 Image
+
+			3.4.2) 함수
+				- 
 */

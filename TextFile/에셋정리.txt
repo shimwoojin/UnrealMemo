@@ -1,0 +1,110 @@
+1. VehicleVarietyPack
+ : 굴러가는 자동차 5개(애님 블프, 블프에 조작용 함수, 스켈레톤, 메쉬 등)
+
+2. TwinmotionReadyposed
+ : 사람 종류 별로 스태틱메쉬 엄청 많음
+
+3. SoulCave
+ : 가슴이 웅장해지는 동굴 맵, 사운드도 있음
+
+4. SCK_Casual01
+ : 남자 옷, 안경, 수염, 복근 등
+
+5. Scanned3DPeoplePack
+ : 춤추는 애니메이션 있음(퀄 좋음), 스켈레탈 메쉬들도 퀄 좋음
+
+6. RuralAustralia
+ : 맵 에셋, 스태틱메쉬 에셋도 엄청 많음(자연 관련, 나무, 바위, 풀, 기타 소품 몇개 
+
+7. ResearchMegaPack
+ : DecalPack(Decal 머티리얼 엄청많음), Research 센터 ? 맵도 있는 듯, 너무 많아, 퀄 개지림
+
+8. Realistic_Starter_VFX_Pack_Vol2
+ : Particle 맛있음
+
+9. QuadrapedCreatures
+ : 여기 Griffon 맛있음, 동물은 아니고 동물형 몬스터 ? 애니메이션도 있음
+
+10. PN_GrassLibrary
+ : 다양한 잔디가 필요하다면
+
+11. ParagonAurora
+ : 애니메이션 짱많음(활용하기 어려울 듯, 특히 리타기팅은 본 구조가 너무 다름
+
+12. AnimStarterPack
+ : FPS에서 써먹을만한 거 꽤 있음
+
+13. FPS_Weapon_Bundle
+ : 라플 4개, umg 2개, 수류탄, 칼, 총알, 탄창, 수직 손잡이, 레드도트, 4배율, 소음기까지
+
+14. Free Furniture Pack
+ : 다양한 가구 많음, 소파, 침대 등 (리얼리즘)
+
+15. ModernHouse
+ : 집 소품들(mesh, material, texture까지는 확인, map은 시간 걸려서 확인 못해봄)
+
+16. MilitaryWeapDark
+ : Shotgun, Sniper, Pisol, Knife, RocketLauncher, GeneradeLauncher, Rifle까지 스켈레탈 메시 있고
+파티클, 사운드도 있음, 탄창(스태틱 메시)도 있음, 발사 애니메이션도 있음(혜자네..?)
+
+17. MilitaryCharSilver
+ : 여캐, 남캐 스켈레톤, 스켈레탈 메쉬, 피지스 에셋, 머티리얼 정도(쓰려면 애니메이션도 구해서 리타기팅해야하고 퀄도 그닥)
+
+18. Megascans
+ : 바닥 머티리얼 혹은 바닥의 식물, 바위 등 머티리얼이나 스태틱메쉬 많음(종류가 너무 많아서 원하는 것 찾기가 어려울 듯)
+
+19. MedievalDungeon
+ : 방탈출 맵으로 쓸만할 듯? 아마 꽤 넓고 으스스한 분위기 나는 맵이였음, 소품들도 메쉬, 머티리얼 제공
+
+20. MCO_Mocap_Basics
+ : 인간형 애니메이션 꽤 있음(Conversations, Mobility_pro, Scared, Walks), 근데.. 음 그닥 ?
+
+21. Kraken
+ : 말 그대로 Kraken, Animation도 있으나 걷기, 맞기, 죽기, 방향따라 때리기 정도 ?
+ : 근데 좀 못 생김
+
+22. KiteDemo
+ : 맵인거 같음
+
+23. InfinityBladeAdversaries
+ : 굉장히 다양한 Enemy 스켈레탈 메시 및 애니메이션 있음(활용도 높을 듯)
+ : 곰, 원숭이, 고릴라 ?, 골렘, 거미 등등
+ : 적 구현할 떄 최우선 고려하면 좋긴하나 메시 자체가 내 스타일은 아니긴 함
+
+24. Infinity_Blade_Assets
+ : 맵 소품(할로윈 분위기), 맵 데모도 있긴 한데 안 뜯어봄
+
+25. Geometry
+ : 큼직한 바위 지형 많음
+ : 퀄은 상당히 높은 듯
+
+26. FXVarietyPack
+ : 파티클 많음(아마 수업 자료)
+
+27. FL_WetFlatwoods
+ : 자연 맵인듯(데모도 있음, 안 열어봄)
+
+28. ConstructionMachines
+ : 중장비 에셋들(크레인, 덤프 트럭 음..암튼 그런 류)
+
+29. CharacterBodyFX
+ : 나이아가라 시스템인데 아직 다룰 줄 몰라서 패스..
+
+30. BSP_ZombieAnims
+ : 좀비 애니메이션(만 있음)
+
+31. BattleWizardPolyart
+ : 땅꼬마 마법사(애니메이션도있음) 별로 맛없음
+
+32. InfinityBladeEffects
+ : 파티클 걍 개맛있음 종류도 많음, 근데 infinity 시리즈에 있는 캐릭이랑 매칭되는 파티클이지만 쓰기 나름
+
+33. GoodSky
+ : 이거 대박, 써먹는 방법 알아서 잘 써먹자
+ : 하늘 바뀜, 종류도 많은 듯
+
+34. UnderWater
+ : 맵 데모, 및 그를 구성하는 머티리얼, 메쉬 등
+ : 퀄 지리긴하네(수면 아래, 수족관 느낌)
+
+35. 
