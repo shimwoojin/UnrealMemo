@@ -99,7 +99,7 @@
 		2.8) 상호작용이 가능한 actor들 상속용 인터페이스(필요하다면 추가)
 
 	3. 통신
-		3.1) Player와 통신
+		3.1) Player의 통신
 			3.1.1) Player와 Skill, Weapon의 관계
 				- Player는 BeginPlay에서 Weapon들을 spawn 후 가지고 있음(Attacker는 2종류, Constructor는 1종류, Farmer는 1종류)
 				- Weapon의 Owner는 Player, Instigator는 Player
@@ -120,85 +120,84 @@
 				- Constructor는 E 혹은 R 발동 시 TowerMaker를 상속받은 Class를 Spawn하게 됨
 				- TowerMaker는 체력을 가졌고 Constructor의 기본 평타(좌클릭)만 TowerMaker에 데미지를 줄 수 있으며
 				- 체력이 0이하가 되면 TowerMaker는 Tower Class를 Spawn하고 소멸
+				- Spawn된 Tower의 Owner, Instigator는 PlayerConstructor
 
+			3.1.4) Enemy가 Player를 인지하는 방법
+				- AIPerception Component의 Update를 통해 들어온 Actor에 대해 현재 조종 중인 Player인지 묻는 인터페이스를 콜해서 target을 잡음
 
+		3.2) 전역에서 통신
+			- BP_GameInstance에 등록하여 사용
 
-			 Spawn한 Enemy들에 접근해야 할 때
-				- Spawner에서 Spawn 후 Spawn한 Enemy들에 대해 배열에 저장
-				- Spawner는 GameInstance에 등록(이렇게 하면 Spawn한 Enemy들에 대해 전역에서 접근 가능
+			3.2.1) DeffensePoint 등록
+				- 상점 UI, Money, 방어지점의 체력을 관리하는 DeffensePoint를 전역에서 접근할 수 있게 만듬
 
+			3.2.2) SpawnerManager 등록
+				- Spawn된 Enemy들에 접근하기 위함(SpawnerManager는 Spawner들은 갖고 있고 Spawner는 각각 자신의 타입에 맞는 몬스터를 갖고 있음)
+				- Spawner를 개별 정의함으로서 World 상에 같은 몬스터에 처리할 내용에 대해 여기서 처리 가능
 
+			3.2.3) 라운드 전환 시 필요한 정보 등록
+				- 상점 UI를 통해 무기, 스킬 강화 후 그 값들에 대해 BP_GameInstance에 저장 후 새로운 level open 시 각 클래스에서 그 값이 유효하다면 다시 set을 하는 방식으로 처리
+				- Weapon 클래스, Skill 클래스, Skill이 Spawn할 Projectile 혹은 Actor에서 각각 자신에 필요한 이전 라운드에서 갱신된 값에 대해 BeginPlay시 BP_GameInstance에 접근하여 값을 얻어오는 방식
 
-
-
-
-
-
-
-
-=====================================================================================
 			
-	3. 클래스마다 특이사항 설명(변수, 함수 위주로)
-		3.1) BP_Character
-			3.1.1) 변수
-				- E_CharacterState State
-				- Map<E_CharacterState, MontageDataAsset> MontageDataMap (State에 따라 실행 할 Montage들)
-				- float LifeNow
-				- float LifeMax
-				- bool bAttackEnabled
-				- bool bAttackTransited
-				- AttackIndex
-			3.1.2) 함수
-				- void AttachActorToMesh()
-				- void EuqipWeapon()
-				- void UnenquipWeapon()
-				- void CollisionOffWithPawn() : Collision의 ObjectType이 pawn인 객체들과 collision 자체를 하지 않음(event를 끄는 게 아님)
-				- void CollisionOnWithPawn() : 
-				- void SetLifeNow()
-				- void SetLifeMax()
+	4. 상위 클래스들을 묶은 기준(하위 클래스들이 공통으로 가질 내용에 대한 설명)
+		4.1) BP_Character
+			4.1.1) 함수 및 변수
+				- Life관련
+				- State
+				- State에 따른 Montage Asset
 				
-			3.1.3) 인터페이스 구현
+			4.1.2) 인터페이스 구현
 				- BeginPlay, CollisionOn/Off, AnyDamage(공용 데미지 처리, 하위 클래스들은 Damage 인터페이스의 WhoCanDamage로 DamageType 확인 후 Damage 처리), SetState
 
-		3.2) BP_Player
-			3.2.1) 변수
-				- bool CurrentControl : Player가 3종류이기 때문에 현재 누가 조종 중인지를 위한 bool 변수
-				- BP_Weapon*(class) WeaponClasses : Weapon spawn용 배열
-				- BP_Weapon* Weapons : Weapon 실제 주소를 담은 배열
-				- CurrentWepaon
+		4.2) BP_Player
+			4.2.1) 함수 및 변수
+				- 현재 조종중인 플레이어인지
+				- Spawn할 Weapon및 Spawn후 Weapon 저장
 
-			3.2.2) 인터페이스 구현
+			4.2.2) 인터페이스 구현
 				- BeginPlay, ControlOn/Off, Run, Jumping, Tick, ZoomIn/Out, AnyDamage, En/DisableAttack, De/ActivateAttack, SetCurrentWeaponHiddenInGame, SwapWeapon, Skill, Action1
 
-		3.3) BP_Enemy
-			3.3.1) 변수
-				- Float RunSpeed
-				- Float WalkSpeed
-				- Float SpawnPerTime : Spawn 주기
-				- Integer DamageType(Bitmask)
+		4.3) BP_Enemy
+			4.3.1) 함수 및 변수
+				- Target이 있을 때 없을 때의 Speed
+				- 어떤 주기로 Spawn이 될지
+				- 누구에게 Damage를 줄 수 있는지
 
-			3.3.2) 함수
-				- bool IsEnemy() (인터페이스 오버라이드, enemy를 상속받았는지 확인)
-				- void SetLifeNow(float) : lifenow 변경 및 체력 표시용 gauge 변경
-				- void SetLifeMax(float) : lifemax  변경 및 체력 표시용 gauge 변경
-				- void SetLifeGaugePercent() : lifenow, lifemax 변경 시 실행 할 내부용 함수(private)
-
-			3.3.3) 인터페이스 구현
+			4.3.3) 인터페이스 구현
 				- SetWalkSpeed, SetRunSpeed,AnyDamage
 
-		3.4) BP_Weapon
-			3.4.1) 변수
-				- Float Damage
-				- Name SockOnEquipped
-				- Name SockOnUnequipped
-				- Name SocketOnTrailStarted
-				- Name SocketOnTrailEnded
-				- Map<E_CharacterState, MontageDataAsset> MontageDataMap
-				- BP_Skill*(class) SkillClasses
-				- BP_Skill* Skills
-				- Integer DamageType : 누구에게 Damage를 줄지 정하는 Bitmask
-				- Texture2D UIImage : PlayerUI용 Image
+		4.4) BP_Weapon
+			4.4.1) 변수 및 함수
+				- 무기 자체의 Damage
+				- 무기가 보유한 skill들
+				- 화면에 띄울 무기 UI Image
+				- 누구에게 데미지를 줄 수 있는지(Attacker 전용은 Enemy에게만, Constructor 전용은 TowerMaker에만, Farmer 전용은 Crops에만)
+				- 무기가 데미지를 줄 수 있는 타이밍을 조절하는 내용
+				- 무기의 effect가 나오는 타이밍을 조절하는 내용
 
-			3.4.2) 함수
-				- 
+			4.4.2) 인터페이스 구현
+				- BeginPlay, BeginOverlap
+
+		4.5) BP_Skill
+			4.5.1) 변수 및 함수
+				- cooltime 관련
+				- UI용 이미지
+				- 누구에게 데미지를 줄 수 있는지
+
+		4.6) BP_TowerMaker
+			4.6.1) 변수 및 함수
+				- Life관련(Constructor가 때려서 부수기 때문, 부서지고 나면 Tower 생성)
+				- 부서지고 나서 Spawn할 타워의 클래스 래퍼런스
+
+			4.6.2) 인터페이스 구현
+				- BeginPlay, AnyDamage, Destroyed
+
+	5. Crops 구현 방식(기존에 고민중이였던 내용, 추가사항)
+		- CropsSpawner는 World상에 n개 배치
+		- CropsSpawner가 Spawn한 Crops가 재배되면(파괴) 재배된 시점부터 시간을 재어 Respawn을 시키는 형태
+		- Crops는 체력을 가짐(Constructor가 TowerMaker에 하는 방식과 같음)
+		- Crops는 Farmer의 E,R 스킬로 강화되어 강화 시 Mesh가 변화하고 재배 시의 Gold량이 변화함(강화의 단계는 4단계 정도 생각 중)
+		- Crops가 강화되는 중엔 무적이며 무적 기간은 Gauge로 표시
+
 */
