@@ -31,5 +31,16 @@
 
 	- GetKnownPercievedActor를 통해 인지된 적이 있는 Actors를 전부 구해올 수 있는 것으로 보아 게임 시간이 길어지면 내부적으로 메모리가 쌓이지 않을까 생각이 듬
 
-	8. 
+	8. RotateToFaceBBEntry Task는 Rotation을 Set으로 처리하는 방식
+	- 이 노드를 쓰려면 UseControllerRatationYaw 옵션을 켜줘야 함
+	- 이 노드의 Detatil에 Precision 옵션이 몇 도 단위로 돌릴지 ? 인 듯
+
+	9. 부드러운 회전을 처리해보기 위해 RInterpTo노드를 사용했는데
+	- 회전시킬 Actor의 기존 Rotation을 Current에 받고 Target을 보기 위해 어떤 Rotation을 가져야 하는지를 계산해서 Target에 넣어주고 어떤 속도로 돌지를 float으로 넘겨주고
+	돌릴 대상의 Rotation을 Set해주면 되는 듯
+
+	10. 시각과 청각 등 2개의 인지를 같이 쓸 때는 감각 구분 없이 인지를 잃고와 얻고로 Target을 잡기 때문에 다른 감각이 Target을 None으로 만들거나 할 수 있기 때문에 주의
+
+	11. Simple Parallel의 Main Task가 바로 끝나는 노드라면 Sub Task가 끝날 때까지 기다려준다는 옵션을 설정해도 애초에 SubTask까지 흐름이 가버리질 못하는 듯
+
 */
