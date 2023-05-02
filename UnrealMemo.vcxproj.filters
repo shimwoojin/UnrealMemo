@@ -4,6 +4,7 @@
     <Text Include="TextFile\3월_언리얼수업정리.txt" />
     <Text Include="TextFile\4월_언리얼수업정리.txt" />
     <Text Include="TextFile\에셋정리.txt" />
+    <Text Include="TextFile\5월_언리얼수업정리.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\March\0302~0306.h" />
@@ -56,5 +57,6 @@
     <ClInclude Include="Class\April\0427.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\MidTermInspection\0428_Check.h" />
     <ClInclude Include="Class\April\0428.h" />
+    <ClInclude Include="Class\May\0502.h" />
   </ItemGroup>
 </Project>

@@ -716,3 +716,175 @@
 	7. WBP_Gauge에서 인터페이스 정의한(SetGaugeColor, SetGaugeRatio)는 WBP_PlayerGauge에서 또 인터페이스 상속해주고 새로 정의해야하는데
 	- WBP_PlayerGauge 내에서 WBP_Gauge를 <사용자 생성> 탭에서 재활용하고 있기 때문에 
 	WBP_PlayerGauge의 변수인 WBP_Gauge의 인터페이스 함수를 콜해서 WBP_PlayerGauge를 재정의하면 유연하게 같은 기능을 가진 인터페이스 함수 구성 가능
+
+=====
+0426
+=====
+	1. BehaviorTree는 AIController를 대상으로 하는 RunBehaviorTree를 통해 실행시킬 수 있음
+	- BP_EnemyController에서 BeginPlay에서 사용할 BT를 지정해줬음
+
+	2. BT의 루트는 한 종류의 노드만 가질 수 있음
+	- BT는 기본적으로 전위 순회를 함(어떤 순서로 실행될지 노드의 우측 상단에 적혀있음, -1은 실행하지 않을 노드라는 뜻(Invalid))
+	전위 순회는 노드 좌측에 선 하나 긋고 루트에서부터 좌측으로 내려오는 식으로 야메로 순서를 알아볼 수 있음(중위는 중앙 아래, 후위는 오른쪽에)
+
+	3. BT의 Composites는 3종류가 있음
+	- Selector : 자식 노드가 하나라도 성공하면 성공임 -> 태스크를 끝냄(if, else if, else의 느낌, 성공은 or 연산 취급)
+	- Sequence : 자식 노드가 전부 성공해야 성공임
+	- SimpleParallel : 보라색에서 뻗어나가는 task가 main(좌측 노드), 검은색(오른쪽)에서 뻗어나가는 task가 main과 같이 실행 될 sub task임
+	노드 디테일에 FinishMode가 있어서 Main이 끝나면 sub를 같이 끌낼 지 Sub도 기다려줄지 정하는 옵션이 있음(자주 쓰는 노드는 아님)
+
+	- Selector 밑에 Sequence, Sequence 밑에 Move To, Wait가 있다면
+	Sequence가 MoveTo, Wait를 둘다 성공 시켜야 Sequence가 성공이고 Sequence가 성공이기 때문에 Selector도 성공이고 태스크를 종료함
+
+	4. MoveTo 노드를 봤을 때 대상을 정해줘야 하는데 위치 벡터 혹은 Actor를 지정해주어야 하고 결국 변수를 가져야 한다는 것이고
+	BT의 변수는 BlackBoard(BB)를 설정해 줄 수 있음
+	- Root 노드의 디테일에서 BB를 장착해 줄 수 있음
+
+	5. BB를 만드는 방법은 1) 콘텐츠 브라우저 우클릭 2) BT내에서 상단 탭에 새 블랙보드 3) 루드 노드에서 생성 가능
+	- 사실 BT에 필요한 대부분의 노드가 BT 상단 탭에서 가능
+
+	6. BB에서 특이 사항 3가지 정도가 있는데
+	- 디테일에 Instance Synced는 블랙보드끼리 같은 값을 갖게 됨(정적 멤버 변수의 느낌)
+	- UObject의 자식 클래스들은 Object 타입을 주고 밑에서 다시 세부 설정하게 만들어져 있음
+	- Parent BT도 줄 수 있는데 Parent에서 작성한 키에 추가로 더 만들어서 쓸 수 있음(상속 가능)
+
+	7. MoveTo에 어디로 이동할지 정해주는 방법은 여러가지가 있는데 그 중 Service로 처리해 봄(상단 탭 -> 새 서비스 혹은 콘텐츠 브라우저에서 생성 가능)
+	- 새 클래스를 만들면 오버라이드를 뭐 할 수 있나 확인하자
+	- Service의 오버라이더블은 8가지지만 크게 4가지로 봤을 때 Activation, Deactivation, Search, Tick 정도로 볼 수 있음
+	- ReceiveActivationAI는 service를 달아준 노드가 활성화 되면 실행된다고 보면 됨
+	- Service에서 변수로 <Black Board Key Selector 구조체>를 만들어서 <인스턴스 편집 가능>을 주면 MoveTo 노드 혹은 다른 task 노드에서 어떤 BB에 그 변수를 할당해 줄지 설정 가능함
+
+	8. Service의 클래스 디폴트에서 Tick에 대해 Interval, RandomDeviation을 설정하여서 tick을 랜덤한 주기로 할 수 있게 해줄 수 있음
+	
+	9. 항상 AIController쪽에선 RunBehaviorTree 후 어떤 BT 쓸지 정하고 Enemy에선 어떤 AIController쓸지 까먹지 않기
+	+ Nav Mesh Bound Volume가 월드에 배치되어 있어야 <길찾기> 가능 -> P를 누르면 갈 수 있는 길이 보이고 Volume의 Z Scale도 중요함
+	- Nav Mesh Bound Volume의 Z가 충분히 크지 않다면 계단 같은 지형에선 AI들이 바보가 될 수 있음
+	- 도착지에 대해서만 volume이 감싸는 게 아니라 출발점에서부터 도착점까지 전부 volume이 커버해야 길 찾을 수 있는 듯
+
+	10. RunTime에 어떤 노드로 들어가고 있는지 확인해 볼 수 있음
+	- 게임 실행 중에 BT내부에서 AIController마다 어떤 내용으로 진행되는지 확인 가능
+
+	11. MoveTo의 디테일에 Acceptable Radius는 오차 허용 범위(그 위치 +- 오차 허용 범위 안에 들면 도착했다고 취급)
+
+	12. RunTime에 AI가 잘 작동하는지 확인하는 방법도 있는데
+	- '(작은따옴표)를 누르면 AI Debugging Mode로 들어가는데 우측 숫자 패드의 0,1,2,3,4에서 디테일 옵션 더 볼 수 있음(키 자판 없으면 불가능한 듯)
+	- Active Task 확인 가능(배열 인덱스처럼 나오는 건 노드의 우측 상단에 적힌 숫자)
+
+	13. BahaviorTreeTask도 우리가 정의할 수 있는데 (BTT)
+	- 오버라이더블에 보면 Abort, Execute, Tick 정도로 볼 수 있음
+	- Abort는 후에 알게 되겠지만 Task 노드가 외부요인으로 중단될 때 callback할 내용 적어줄 수 있는 듯
+	- BTT는 Excute이벤트가 끝나면 끝나는 게 아니라 <FinishExecute를 실행>해서 성공이든 실패든 알려주어야 task 노드 탈출 가능함
+	- 노드 자체가 실행 시간을 길게 가져야 한다면 Tick 같은 이벤트에서 시간을 끌다가 FinishExecute로 끝내는 방식도 가능하단 것(굳이 tick은 아니여도 됨)
+
+=====
+0427
+=====
+	1. BT의 Composite들 중에 Selector는 자식 중에 하나라도 성공하면 흐름 멈추고 Sequence는 자식 중에 하나라도 실패하면 흐름 멈춤
+	- 단락 회로 평가(Short Circuit Evaluation)랑 같다고 보면 됨
+
+	- Or 연산에선 하나만 참이면 참이기 때문에 A or B에서 A가 참이라면 B는 참인지 거짓인지 확인조차 안 함
+	ex) A or (B+=3) 이라면 A가 참일 때 B는 값이 변하지 않음, A가 false라면 B의 값이 변하겠지
+	- 마찬가지로 And 연산에서 A and B에서 A가 거짓이라면 B는 확인하지 않음
+
+	- 대입연산잔의 반환값은 자기 자신임 -> x = y = z = 0; 이 성립하는 이유
+
+	- A or TestFunction()에서 함수가 실행될지 안 될지를 구분하려면 위의 내용을 알아야 함
+
+	2. Task를 하나 구성해보던 중에 Execute AI 이벤트에서 조종하는 pawn에 Dodge를 인터페이스로 불러서 실행시켜주고 바로 FinishExecute를 성공처리하면
+	문제가 있는데
+	- 구르는 중에 다음 task로 넘어가버리기 때문에 문제가 생길 수 있음
+	- 구르는 동작이 확실히 끝날 때 놓아주어야 함 -> 어떻게 ? -> state
+	- state가 dodging이 아닐 때를 tick에서 검사해서 finishexecute해주면 됨
+
+	3. Task에 <데코레이터>를 달아줄 수 있는데
+	- Task가 실행하기 전에 <데코레이터>에 대한 평가를 먼저 진행하고 <데코레이터>가 거짓으로 평가되면 task는 실행하지 않음
+	- CoolDown이라는 만들어진 <데코레이터>를 사용했는데 시간을 정해놓고 한 번 실행한 task가 다음 유효시간 전에 노드에 들어오면 false를 반환
+
+	4. <데코레이터> 중 자주 BlackBoard의 값으로 평가를 할 수도 있는데
+	- IsSet, IsNotSet으로 값이 설정된 지 안 된지로 평가할 수 있음 -> Actor나 Vector는 이런 식으로 설정하고
+	- Enum값을 평가로 사용하게 되면 어떤 타입일 때 true로 평가할지 등 자료형에 따라 평가 내용이 달라짐
+
+	5. service, task, decorator등의 key 설정은 각 클래스에서 <인스턴스 편집 가능>을 주고 BT에서 노드의 디테일에서 개별 설정해야 함
+
+	6. <데코레이터>는 service보다 우선함
+	- Root 바로 밑 노드에는 <데코레이터>가 붙을 수는 있으나 <데코레이터>가 무시 됨 -> 색이 거무죽죽해지며 무시 된다고 경고문구 나옴
+	- <데코>의 값을 바꾸는 로직이 <서비스>에 있는데 <데코>가 항상 먼저 실행되어 <데코>의 값을 바꿔줄 <서비스>에 도착할 수 없어 BT가 실행할 수 없는 상황을 방지하기 위해
+
+	- <데코레이터>, <Task>, <Service>가 같은 노드에 같이 붙으면 1)데코 2) Service 3) Task 정도의 순인 듯, task가 마지막
+
+	7. EnemyMelee, EnemyRanged로 나누기 위해 BP_Enemy는 abstract로 만들고 새로운 BT 만들어주고 플레이어를 target으로 지정할 object - character를 변수로 지정
+
+	8. 적이 플레이어를 발견하면 칼을 뽑게 하기 위해 BTT_Arm 작성
+	- IsArmed가 false라면 WeaponA 인터페이스 함수를 실행하여 칼을 뽑도록
+	- task가 끝나는 시점을 정확히 지정해주기 위해 tick에서 arming이 false일 때 task가 끝나도록 finishexecute - true로
+
+	- 이런 작업할 때 주의할 점이 이 노드를 탈출하지 못하는 상황을 방지해야하는데 Arming이 false일 때가 탈출 조건인 지금은 문제가 없었음
+	- 아마 AI 작업하다 보면 이 부분이 굉장히 문제가 많이 생길 듯
+
+	9. 언리얼이 AIPerception Component를 지원해주는데
+	- Enemy에 추가하고 BP에선 Hearing이나 Sight정도 사용 가능 ( Damage는 못 쓴다고 하심)
+	- AIPerception 블프도 사용자 정의가 가능 -> AIPerception 내의 sense config도 새로 정의해서 AIPerception에 장착해주어야 함(언젠간 시도해보는 걸로)
+	SenseConfig의 이벤트 중에 Listener는 AIPerception의 수용자 정도로 생각해야 함(AIPerception의 주인)
+
+	10. SenseConfig 중에 SightConfig를 상세히 알아보면
+	- Sight Radius : 시야 범위
+	- Lose Sight Radius : 시야 범위에 잡힌 target을 잃어버리기까지의 범위
+
+	ex) Sight Radius는 1000인데 Lose Sight Radius는 10000이라면 한 번 발견되면 텔레포트하지 않는 이상 계속 시야에 잡힌다는 뜻
+
+	- PeripheralVisionHalfAngleDegree : 정면을 중심으로 좌우의 시야각 -> 75라면 정면을 기준으로 좌우 각 75, 총 150도
+	- DetectionByAffiliation : 적, 중립, 친구 설정 -> 블프는 다 체크하자, 어차피 의미없음(cpp에서나 가능)
+	- AutoSuccessRangeFromLastSeenLocation : 마지막 위치에서부터 원형 반경으로 이 범위까지는 시야에 잡힘
+	- PointOfViewBackwardOffset : 적의 시야를 뒤통수부터 시작할 수 있게 해줌 -> springarm 생겨 먹은거 생각하면 될 듯
+	- NearClippingRadius : 뒤통수 시야각 조금 깎아내 줌
+	- 최대 수명 : 감각을 잊기까지 걸리는 시간(0초라면 안 까먹음)
+
+	- AIDebugging모드 (')로 들어가서 우측 키패드 4를 누르게 되면 perception이 어떻게 이루어 지고 있는지 확인 가능함
+	초록 반경 : SightRadius, 빨간 반경 : LoseSightRadius
+
+=====
+0428
+=====
+	1. AIPerception Component의 Touch Config는 모바일의 Touch가 아니라 실제 오브젝트 간 닿았는지에 대한 인지임
+	- CPP에 가서 더 알아보기로
+
+	2. Hearing Config의 실제 범위는 Hearing Range 1가지임(LOS Hearing Range는 디버깅 시 범위만 표시해줌, 기능이 없음)
+	
+	3. Sense Config의 EnableStarted를 꺼도 인지 자체는 꺼지더라도 디버깅 시 범위 표시까지 꺼지지는 않음
+
+	4. 몽타주에 PlaySound Notify 배치하여 원하는 타이밍에 음원파일 재생 가능
+	- 하지만 우리가 듣는 소리와 별개로 AI가 인지하기 위해선 '소리가 난다'라는 다른 함수를 호출하여야 인지 가능함(함수 이름 : Report Noise Event)
+	- Report Noise Event의 Max Range가 0이 라는 것은 범위가 무제한 이라는 뜻(World 어디서든 '소리를 들을 수 있다'라는 뜻)
+
+	5. 실제 음원파일을 재생하는 함수 종류가 몇 가지 있는데(간단한 함수의 설명은 생략)
+	- PlaySound2D
+	- PlaySoundAtLocation
+	- PlaySoundAttached : Component에 붙여 그 위치에서 소리나게 끔 할 수 있음(Attach Point Name(Name 타입) 인자도 받는데)
+	(사실 궁금한 점은 Name을 받아서 그 위치에서 동작 시켜주는 것 중에 아는 건 SkeletalMesh의 Socket 정도 밖에 없는데 다른 Scene Component에도 Name으로
+	위치를 특정할 수 있는게 있는가 궁금함)
+
+	6. AIPerception이 인지한 대상은 이벤트를 통해 확인할 수 있음(OnTargetPerceptionUpdated, OnPerceptionUpdated, OnTargetPercpetionInfoUpdated)
+	- 인지를 얻거나 인지를 잃었을 때 이벤트가 발생하는 점은 비슷하나 넘어오는 정보가 다름(기본적으로 OnTargetPercetpionUpdated가 인지된 Actor를 반환함)
+	- 어느 이벤트든 Stimulus(자극) 구조체가 넘어오는데 break하여 내게 필요한 정보만 사용할 수 있음(유용한 핀 중에 Successfully Sensed의 True or False 여부로
+	인지를 얻은지 잃은지를 구분할 수 있음)
+
+	7. AIPerception에서 여러 Sense Config를 사용하여 구성하고자 한다면
+	- AIPerception Component를 시각용, 청각용, 팀 전용 등으로 구분하여 Component당 감각 하나씩 맡아서 처리하는 간단하고 무식한 방법이 있음
+	- GetCurrentlyPercievedActors 노드를 통해 어떤 감각을 통해 인지 된 Actors 인지를 배열로 반환하기 때문에 이 노드를 이용하면 어떤 감각에 걸린지를 알 수 있음
+	- GetKnownPercievedActors를 통해 인지가 한 번이라도 된 actors를 전부 얻어 올 수도 있고
+	- GetPercivedActors는 Deprecated된 노드이므로 사용하지 않기로
+
+	- GetKnownPercievedActor를 통해 인지된 적이 있는 Actors를 전부 구해올 수 있는 것으로 보아 게임 시간이 길어지면 내부적으로 메모리가 쌓이지 않을까 생각이 듬
+
+	8. RotateToFaceBBEntry Task는 Rotation을 Set으로 처리하는 방식
+	- 이 노드를 쓰려면 UseControllerRatationYaw 옵션을 켜줘야 함
+	- 이 노드의 Detatil에 Precision 옵션이 몇 도 단위로 돌릴지 ? 인 듯
+
+	9. 부드러운 회전을 처리해보기 위해 RInterpTo노드를 사용했는데
+	- 회전시킬 Actor의 기존 Rotation을 Current에 받고 Target을 보기 위해 어떤 Rotation을 가져야 하는지를 계산해서 Target에 넣어주고 어떤 속도로 돌지를 float으로 넘겨주고
+	돌릴 대상의 Rotation을 Set해주면 되는 듯
+
+	10. 시각과 청각 등 2개의 인지를 같이 쓸 때는 감각 구분 없이 인지를 잃고와 얻고로 Target을 잡기 때문에 다른 감각이 Target을 None으로 만들거나 할 수 있기 때문에 주의
+
+	11. Simple Parallel의 Main Task가 바로 끝나는 노드라면 Sub Task가 끝날 때까지 기다려준다는 옵션을 설정해도 애초에 SubTask까지 흐름이 가버리질 못하는 듯
+

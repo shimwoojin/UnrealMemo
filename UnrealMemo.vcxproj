@@ -141,6 +141,7 @@
   <ItemGroup>
     <Text Include="TextFile\4월_언리얼수업정리.txt" />
     <Text Include="TextFile\3월_언리얼수업정리.txt" />
+    <Text Include="TextFile\5월_언리얼수업정리.txt" />
     <Text Include="TextFile\에셋정리.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +180,7 @@
     <ClInclude Include="Class\March\0329.h" />
     <ClInclude Include="Class\March\0330.h" />
     <ClInclude Include="Class\March\0331.h" />
+    <ClInclude Include="Class\May\0502.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\MidTermInspection\0428_Check.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\SequenceOfTheWork\0_BasicActivationOfCharacter.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\SequenceOfTheWork\10_DetailFor0to9.h" />
