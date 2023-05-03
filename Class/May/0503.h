@@ -9,6 +9,7 @@
 
 	3. BTT_Patrol을 구성하기 위해 Controlled Pawn에서 GetComponentByClass로 BP_PatrolComponent를 훔쳐오는데 인터페이스를 구성하는 것이 더 좋음
 	- GetComponentByClass는 남발하면 안됨 -> 위험한 함수
+	- 인터페이스가 아닌 형변환으로도 처리가 가능하나 기획의도랑 맞아야 함(cast하는 대상부터 자식으로 patrol 기능을 가진다거나 하는?)
 
 	4. MoveToLocation이라는 함수로 이동시키려는 대상에 대해 Location을 주면 이동함(이 함수는 MoveTo같은 다른 이동 함수가 아니라면 명령을 끝까지 수행함)
 	- Return Value로 Failed, AlreadyAtGoal, RequestSuccessful이 나오는데 이걸 switch로 활용하여 execute 실패, 다음 이동 장소 정하고 execute 성공, execute 성공 등의 처리를 함
@@ -41,5 +42,5 @@
 	- 추가로 다음 기존 몽타주가 다음 몽타주에 BlendOut이 되는 것이 아니라 다음 몽타주가 기존의 몽타주를 BlendIn하는 방식으로 처리하는 것
 
 	10. BlendOut 관련 옵션 중에 애니메이션 시퀀스 쪽에서 <실제 BlendOut을 수행하는 시간>과 <BlendOut으로서 인지하게끔 Trigger> 시키는 시간을 다르게 줄 수 있는 옵션이 있음
-	- BlendOutTriggetTime은 Default가 -1인데 BlendOut과 같은 값을 가지겠다는 의미임
+	- BlendOutTriggerTime은 Default가 -1인데 BlendOut과 같은 값을 가지겠다는 의미임
 */
