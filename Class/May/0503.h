@@ -39,7 +39,7 @@
 	- 콤보 공격의 흐름을 정리하면
 	1타 공격 발생 -> 다음 콤보로 이어질 수 있으면 BlendOut에서 다음 몽타주를 재생하라고 명령 -> 다음 몽타주 재생은 기존 몽타주에게는 OnInterrupted로 작용 및 OnCompleted로는 흐름이 가지 않음
 
-	- 추가로 다음 기존 몽타주가 다음 몽타주에 BlendOut이 되는 것이 아니라 다음 몽타주가 기존의 몽타주를 BlendIn하는 방식으로 처리하는 것
+	- 기존 몽타주 입장에서 자신이 실행중에 방해받은 것으로 처리되기 때문에 기존 몽타주가 다음 몽타주에 BlendOut이 되는 것이 아니라 다음 몽타주가 기존의 몽타주를 BlendIn하는 방식으로 처리하는 것
 
 	10. BlendOut 관련 옵션 중에 애니메이션 시퀀스 쪽에서 <실제 BlendOut을 수행하는 시간>과 <BlendOut으로서 인지하게끔 Trigger> 시키는 시간을 다르게 줄 수 있는 옵션이 있음
 	- BlendOutTriggerTime은 Default가 -1인데 BlendOutTime과 같은 값을 가지겠다는 의미임
