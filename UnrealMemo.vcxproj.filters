@@ -58,5 +58,6 @@
     <ClInclude Include="MyNote\Portpolio\DADemo\MidTermInspection\0428_Check.h" />
     <ClInclude Include="Class\April\0428.h" />
     <ClInclude Include="Class\May\0502.h" />
+    <ClInclude Include="Class\May\0503.h" />
   </ItemGroup>
 </Project>
