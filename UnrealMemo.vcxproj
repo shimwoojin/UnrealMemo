@@ -182,6 +182,7 @@
     <ClInclude Include="Class\March\0331.h" />
     <ClInclude Include="Class\May\0502.h" />
     <ClInclude Include="Class\May\0503.h" />
+    <ClInclude Include="Class\May\0504.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\MidTermInspection\0428_Check.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\SequenceOfTheWork\0_BasicActivationOfCharacter.h" />
     <ClInclude Include="MyNote\Portpolio\DADemo\SequenceOfTheWork\10_DetailFor0to9.h" />
