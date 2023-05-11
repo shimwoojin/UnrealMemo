@@ -1,3 +1,276 @@
 =====
 0502
 =====
+	1. Interface의 Naming은 좀 더 포괄적으로
+	- ex. SkillQ 같은 네이밍은 키 바인딩이 바뀌게 되면 Q가 아니게 될 수 있음
+	- ex. DrinkPotion() -> UseItem()
+	- DrinkPotion의 경우는 구체화하는 클래스 쪽에 가서 DrinkPotion() 함수를 만들고 UseItem() 인터페이스에 물려주는 식으로 해야 좋은 설계일 듯
+
+	2. BT의 데코레이터 중에 IsAtLocation을 사용하여 Target과 조종당하는 enemy 간에 거리 검사가 가능한데
+	- 이 때 인심좋은 AI를 만들기 위해서 Aceptable Radius를 150을 줌
+	- 이 값을 너무 적게 줘버리면 공격을 하다가도 조금만 멀어져도 다시 따라붙음
+
+	3. AI의 정찰을 위해 AI가 목표로 삼을 location을 선과 점의 형태로 가진 SplineComponent가 있음
+	- BP_PatrolRoute : 새 Actor는 Splinecomponent만 가지고
+	- BP_PatrolComponent : ActorComponent이고 위에서 만든 Actor의 오브젝트 래퍼런스를 가지고 <인스턴스 편집>을 주어서 월드상에 배치를 하게 될 위 Actor에 대해 변수로 알고 있음(월드에서 배치 이후 지정해주어야 함)
+
+	4. BP_PatorlRoute를 월드 상에 배치하고 나면 Point 2개로 시작해서 여러 개를 찍을 수 있는데
+	- 포인트에 마우스 우클릭 하고 <복제> 후 복제로 생겨난 point를 적절한 위치로 옮겨주면 됨
+	- 실제 AI의 이동은 point를 기준으로 움직이기 때문에 배치 시 생겨난 곡선의 형태가 아닌 Point를 향해서 움직임
+
+	5. 배치한 BP_PatrolRoute를 편리하게 다루는 방법 중에
+	- 배치한 actor의 component에 직접 값을 바꿔주는데
+	- 0번 point -> 1번 point의 유형을 Curve -> Constant로 바꿔 실제 어떻게 움직일지 직관성을 높일 수 있고
+	- CloseLoop를 True 주게 되면 Point의 끝 지점에서 다시 0번 지점으로 이동하게 됨 ( 아니라면 끝 지점에 도달하고 끝 -1 , 끝 -2 이렇게 움직일 예정)
+
+	6. BP_PatrolRoute의 기즈모가 처음과 달라질 수가 있는데
+	- 0번 point에 대해 위치를 옮기게 되면 그럴 수 있음(Actor 자체를 옮긴게 아니라)
+
+	7. 위에서 만든 BP_PatrolComponent를 Enemy 혹은 Enemy_Melee에 달아주고 (용도에 따라 위치는 선택) 실제 월드에 배치한 Enemy에 대해 BP_PatrolComponent가 가진 실제 월드에 배치한 BP_PatrolRoute를 변수에 설정해주어야 함
+	
+	8. Enemy에 물려준 PatrolComponent가 하는 일은 월드에 배치된 SplineComponent를 들고 있는 Actor를 알고 그 Actor의 SplineComponent에 접근해서 위치를 얻어오는 처리를 하는 것 같음
+	- 우리가 만들어 둔 point를 0부터 n까지를 정할 Index가 필요하고
+	- 1) 0부터 n까지 일지 2) n부터 0까지 일지 3) 0부터 n까지 그냥 쭉 loop를 돌지를 정할 bReverse로 필요하고
+
+	9. 결국 Enemy입장에서 알아야 하는건 결국 월드에 배치한 Actor의 SplineComponent에 접근해서 GetLocationAtSplinePoint(Index로 각 point위치를 얻을 수 있음)
+	- 그 처리를 대신해 줄 BP_PatrolComponent를 만든 것임
+
+	10. GetDestination이 Boolean 반환 값이 있는 이유는 공교롭게 patrol point가 원점(0,0,0)일 때 길이 있는데도 원점인건지 길이 없어서 원점인건지를 알게 해줌
+
+=====
+0503
+=====
+	1. 배그 우클릭 길게 -> 견착, 우클릭 짧게 -> 스코프 같은 구현
+	- Timer를 안 쓰고 구현 하는 방법에 대해 질문함
+	- Sequence, Gate를 응용 -> Gate 내부 내용 빈 매크로에 복붙 후 Output에 Gate가 실행되지 않았을 때 Pin을 결과로 쓸 수도 있음
+
+	2. Spline Component의 함수 중 GetLocationAtSplinePoint의 Local과 World의 차이는 World는 실제 배치 된 위치(World의 0,0,0 기준)인 거고 Local은 World상에 배치된 Actor의 Gizmo를 기준으로 함
+	- World로 바꿔줌
+
+	3. BTT_Patrol을 구성하기 위해 Controlled Pawn에서 GetComponentByClass로 BP_PatrolComponent를 훔쳐오는데 인터페이스를 구성하는 것이 더 좋음
+	- GetComponentByClass는 남발하면 안됨 -> 위험한 함수
+	- 인터페이스가 아닌 형변환으로도 처리가 가능하나 기획의도랑 맞아야 함(cast하는 대상부터 자식으로 patrol 기능을 가진다거나 하는?)
+
+	4. MoveToLocation이라는 함수로 이동시키려는 대상에 대해 Location을 주면 이동함(이 함수는 MoveTo같은 다른 이동 함수가 아니라면 명령을 끝까지 수행함)
+	- Return Value로 Failed, AlreadyAtGoal, RequestSuccessful이 나오는데 이걸 switch로 활용하여 execute 실패, 다음 이동 장소 정하고 execute 성공, execute 성공 등의 처리를 함
+
+	5. BTT_Patrol내부에서 적의 BP_PatrolComponent가 필요한데 이 변수를 얻어오는 과정을 처음 한 번만 수행하게끔 하도록 바꾼 방법은
+	- BP_PatrolComponent유형의 변수를 만들어서 Valid 검사를 하고 InValid일 때만 Setting해주면 최초 시도에만 값 세팅하게 됨
+	- 최초 시도 시 Component에 값 세팅해주고 나서도 valid검사를 하는데 이때 Invalid라면 실패 처리
+
+	6. IsAtLocation 데코레이터에 잡혀있는 taget이나 MoveTo에 잡혀있는 Target이 Invalid라면 실패로 처리되는 듯
+	- MoveTo의 Target이 유효해서 명령이 시작되고 나면 중간에 Target이 Invalid로 바뀌더라도 계속 따라옴 -> Target이 Invalid되면 MoveTo 실행 안 하게 하려면
+	Target에 대해 위에서 데코레이터(블랙보드)로 관찰자에 대해 설정해줘야 함
+
+	7. 강사님이 생각하시길 Task 기본 MoveTo는 Success 혹은 Fail에 도착해야 FinishExecute로 그때서야 풀어주는 거라고 하심
+	- AIMoveTo에서 그냥 1) 그냥 실행 핀 2) Success 3) Fail이 있는데 아마 기본 Task인 MoveTo는 그냥 실행핀에 연결이 없는 듯
+	- AIMoveTo는 그냥 실행 핀으로 빼서 FinishExecute 주면 흐름을 바로 뺄 수 있음
+
+	8. 기존 BP_Patrol에서 Tick에서 처리하던 MoveToLocation은 사실 상 Tick 발동이 안함
+	- MoveToLocation의 반환 값 3종류에서 모두 FinishExecute 해버리기 때문
+	- ExecuteAI로 내용 모두 이사
+
+	9. 공격 중 피격 당하면 다음 공격이 안되는 버그를 고치는 과제 피드백에서
+	- 일단 과제의 핵심 Key는 AttackEnalbed가 맞고 OnCompleted로 흐름이 가지 못하기 때문임
+	- 그래서 간단하게 생각했을 때 Montage의 OnInterrupted에서 처리하려는 생각이 잘못된 이유는
+	- OnInterrupted라는 건 다른 몽타주가 재생되는 상황에도 발생되는 핀이기 때문에
+	- 콤보 공격에서 다음 몽타주가 이 몽타주의 OnInterrupted를 발생시킴
+
+	- 콤보 공격의 흐름을 정리하면
+	1타 공격 발생 -> 다음 콤보로 이어질 수 있으면 BlendOut에서 다음 몽타주를 재생하라고 명령 -> 다음 몽타주 재생은 기존 몽타주에게는 OnInterrupted로 작용 및 OnCompleted로는 흐름이 가지 않음
+
+	- 기존 몽타주 입장에서 자신이 실행중에 방해받은 것으로 처리되기 때문에 기존 몽타주가 다음 몽타주에 BlendOut이 되는 것이 아니라 다음 몽타주가 기존의 몽타주를 BlendIn하는 방식으로 처리하는 것
+
+	10. BlendOut 관련 옵션 중에 애니메이션 시퀀스 쪽에서 <실제 BlendOut을 수행하는 시간>과 <BlendOut으로서 인지하게끔 Trigger> 시키는 시간을 다르게 줄 수 있는 옵션이 있음
+	- BlendOutTriggerTime은 Default가 -1인데 BlendOutTime과 같은 값을 가지겠다는 의미임
+
+=====
+0504
+=====
+	1. AI가 무장하는 동안 인지 밖으로 나가면 바로 target을 잃어버리는 로직 수정중에
+	- AIPerception Component가 인지를 얻거나 잃었을 때 호출되는 이벤트가 3개 있고(호출시점은 같음)
+	- Stimulus 구조체가 가진 정보중에 AIPerception에서 세팅해놓은 <최대 수명>을 활용하여 로직을 작성하려고 했으나 이벤트에서 나오는 출력 값 말고는 이 값을 끌어 쓸 수 있는 방법이 없음
+	- Age : Stimulus를 분해 값 중 <최대 수명>에 대해 인지를 잃은 순간부터 시간을 재는 거고
+	- Expiration Age : <최대 수명> 그 자체 -> 내 생각에 그냥 이 값을 SetTimerByEvent로 활용하는 게 좋을 듯
+
+	2. GetKnownPerceivedActors와 GetCurrentlyPerceivedActors의 차이는
+	- GetKnownPerceivedActors : <최대 수명>의 시간까지 지난 Actor들
+	- GetCurrentlyePerceivedActors : <최대 수명>과 상관없이 인지가 된 Actor들 ( Succesfully Sensed가 false로 나가지 않은 애들 )
+
+	3. BT에 버그(?)가 있는데
+	- Root 바로 밑을 끊어도 정상 실행 됨
+
+	4. AIPerception Component를 활용함에 있어서 <이벤트>만을 활용하기엔 부족함이 있음
+	- GetKnownPerceivedActors나 GetCurrentlyPerceivedActors 등 AI 관련 함수들 잘 조합해서 로직 짜기로
+
+	5. Enemy의 최상 클래스에서 BTAsset을 관리하고 거기서 RunBehaviorTree를 해주고 자식에선 BTAsset만 다른 값들을 장착해주면 관리가 편함
+	- GetAIController는 Self 혹은 누구의 컨트롤러인지 알려줘야 함(valid 체크는 센스)
+
+	6. 캠 쉐이크 부모는 <MatineeCameraShake> 사용
+	- 진동을 얼마나 줄지(BlendIn, BlendOut도 있음 -> 피격 시 효과의 경우는 BlendIn, BlendOut은 효과가 별로라서 0)
+	- Rotation에 대해 Location에 대해 FOV에 대해서도 Oscillation을 줄 수 있음
+	- 각각 x,y,z에 대해 진폭을 얼마나 주기를 얼마나 할지 줄 수 있고
+	- sin 파형 혹은 Perlin Noise 파형으로 줄 수도 있음 -> 파형의 어느 지점부터 시작할 지에 대한 offset도 줄 수 있음(random 혹은 0)
+
+=====
+0508
+=====
+	1. CameraShake에서 피격 시 설정된 값들을 나열하면
+	- 얼마나 ? : 0.25(BlendIn, BlendOut -> 0)
+	- Y위치에 대해 진폭 : 5, 주기 : 150
+	- Z위치에 대해 진폭 : 5, 주기 : 150
+
+	2. Player의 AnyDamage에서 CameraShake를 처리하는데
+	- Player가 소유한 Controller에 접근하고
+	- Controller를 PlayerController로 Cast하고(PlayerCameraManager에 접근하기 위해, 그냥 Controller 클래스는 카메라 매니저 없는 듯)
+	- PlayerController에서 PlayerCameraManager에 접근해서
+	- StartMatineeCameraShake를 호출 함
+
+	- PlayPlace는 Local로 줬음 / World로 준다면 World 좌표 기준으로 y,z가 흔들릴 것(의도한 바가 아님)
+	- StopCameraShake는 안해줘도 기간이 끝나면 알아서 종료
+
+	3. StartMatineeCameraShake VS StartCameraShake
+	- Matinee가 더 구체화 된 클래스로 return
+	- 기능상에 좋은 점이 있다고 하셨기 때문에 StartMatineeCameraShake를 쓰는 게 더 최신이라고 하심
+	- 근데 내가 알기로 Matinee는 사장 된 구버전의 유물이고 Sequence가 최신인 것으로 알고 있었는데
+	- CameraShake는 Matinee가 더 쓰기 편한 듯
+	
+	- SequenceCameraShake 블프를 만들어서 확인해봤는데 SequenceSineActor인가 아무튼 그래프가 어떻게 생겼는지를 직접 만들어서 대입해줘야 함(이게 더 직관적일 거 같긴한데 사용법을 모르니 나중에 알아보기로)
+
+	4. 2번에서 Controller를 얻어오는 방식에서 GetPlayerController로 얻어올 수도 있으나 저런 방식으로 처리한 것이 의아했고 GetPlayer계열 함수를 조사하는 게 과제였음
+	- 그렇다면 외부에서 GetPlayer계열을 안 쓰고 얻어올 수 있는 방법은 GameInstance에 등록하고 쓰는 것
+
+	5. 원거리 Enemy를 만들기 위해 새롭게 EnemyRanged 만들고 무기는 안 주고 스킬만 2개 새로 물려 줌
+	- BT도 원거리용으로 물려 줌
+
+	6. AIPerception에서 문자열로 Target을 잡는 부분에 대해 문자열 의존성을 줄이면 좋다고 하셨는데 그 방법은
+	- Enemy에서 Target을 갖고 있고
+	- Service에서 Enemy에 접근할 수 있기 때문에 Enemy가 들고 있는 Target을 BT의 Target과 일치시켜주는 작업을 할 수 있음
+
+	7. 루트 밑에는 대체로 Selector
+
+	8. 일단 임시로 작성된 로직이지만 BT 로직을 보면
+	- Target이 Set되어 있으면 Target방향으로 돌고 스킬을 장착하고 공격함
+
+	9. 스킬을 장착하는 Task를 만들었는데
+	- Tick에서 처리하기 때문에
+	- Idle이 False일 때도 Task를 끝내지 않고
+	- 어떤 스킬도 활성화가 돼있지 않다면 스킬을 활성화 함
+	- 다른 스킬을 활성화 하기 위한 스위치가 켜져 있다면 다른 스킬로 활성화하고
+	- 스위치가 꺼져 있다면 Task를 성공으로 종료
+
+	- 스위치 On/Off, 인덱스는 <인스턴스 편집>으로 BT에서 편집
+
+	- 스킬을 장착하는 로직 자체로만 보면 그냥 스킬을 장착하기만 하면 되기 때문에 간단하지만 다른 스킬이 On되어 있을 때의 예외처리 때문에 복잡해보이는 것
+
+	10. <데코레이터>에서 Task가 실행 중이건 말건 중지 시켜버릴수도 있는 기능이 있는데
+	- <데코레이터 - 블랙보드>의 FlowControl 탭에서 <관찰자 중단>, <NotifyObserver> 값을 입맛에 맞게 바꿔주면 됨
+
+	10.1) 관찰자 중단
+	- None : 아무것도 안함
+	- Self : 자기 자신
+	- LowerPriority : 지금 실행하는 노드보다 늦게 실행 될 Task들
+	- Both : Self와 LowerPriotiry에 대한 Both로 자기 자신도 취소하고 LowerPriority들도 다 취소시킴
+
+	- 어떤 것이 취소가 될지에 대해서 설정하고 나면 색깔로 확인 가능
+
+	10.2) NotifyObserver
+	- ResultChange : Setting된 값이 None이 됐거나 새로 생겼거나
+	- ValueChange : Setting된 값이 바꼈거나 None이 됐거나 새로 생겼거나 -> ResultChange의 상위 호환
+
+	- 관찰자 중단이 특히 MoveTo 같은 Task랑 같이 사용하면 강력함
+
+	11. 8번 9번대로 스킬을 장착하고 스킬을 날리면 Montage는 재생하는데 스킬 자체의 Fireball이 안 날라감
+	- 그 이유는 스킬 내부에서 어디로 날릴지 정하는 함수가 실패(정확히는 Camera가 Cast실패함)했기 때문에 Fireball을 Spawn하지 않기 때문임
+
+=====
+0509
+=====
+	1. UWorld와 Level의 관계는 SceneManager와 Scene의 관계 정도
+	
+	2. GetPlayer계열 함수는 PlayerController가 기반이 되어서 나머지를 처리함
+	- 멀티 플레이 게임에서 부여받은 인덱스를 통해 접근(이 인덱스는 ID와는 또 별개)
+
+	3. BT에서 <데코레이터>의 관찰자 중단은 실행 흐름에 관계 없이 취소시키고자 등록한 내용(Self 혹은 LowerPriority 혹은 둘다)을 취소시킴
+
+	4. Fireball은 그냥 Enemy가 던질 땐 Enemy의 정면벡터 방향으로 던짐
+	- Enemy로 판단되는 기준은 fireball의 destination 지정이 안된 것으로 알 수 있음(카메라가 없기 때문)
+	- BT에서 Rotate를 한다는 보장이 돼있기 때문에 어디로 던져야 한다는 로직이 필요없음
+	- Z축 차이가 있으면 못 때리게 되는 로직이긴 함
+
+	5. EQS의 SimpleGird를 만들어봄
+	- EQS는 BT에서 Run EQS Query로 Task로 처리됨
+	- 우리가 만든 EQS를 이 Run EQS Query노드에 물려줘야 하는데 디테일 탭에 Deprecated된 내용이 있기에 주의
+	- 실제 등록은 EQS - EQS Request에서 해야 함(Query Template)
+	- EQS에서 득점을 많이 한 위치에 대해서 BB의 어떤 값에 물려줄지도 디테일 탭에서 설정
+	- 상위 몇%에서 Random한 값을 줄지 정하는 옵션도 있음 -> 기본 값은 SingleBestItem
+
+	6. EQS 디버그 방법은 ' 누른 후 키패드 3
+
+	7. EQS SimpleGrid의 디테일 탭
+	- GridHalfSize : Querier 혹은 Item의 위치를 기준으로 정사각형 모양만큼 ( 500이라면 1000 * 1000의 정사각형 만큼 위치 만듬 )
+	- SpaceBetween : GridHalfSize로 만들어진 영역안에 각 위치를 얼마만큼의 간격으로 생성할지
+	- GenerateAround : Querier일지 Item일지 인데 Item은 어떤 걸 의미하는 건지 ?
+
+	8. SimpleGrid에 테스트 추가해봄 (Distance)
+	- Test Purpose : Filter 혹은 Score 혹은 Filter와 Score 둘 다 적용(Filter는 안 쓸 애들 걸러내는 것)
+	- TestMode : Distance2D, Distance3D, Z에 대해, Z 절대값에 대해 정도(2D와 3D의 차이는 3D는 실제 Actor의 Location을 기준으로 함, 2D는 Actor의 Location중 X,Y만 활용)
+	- DistanceTo : Querier가 있고 다른 건 뭐가 있지 ?
+	- 필터 : Minimum이면서 500을 주면 500보다 가까이 있는 애들은 전부 필터링 된다는 뜻
+	- Score : 최종 선발 -> 결국 점수가 높은 위치가 선발되는 것
+	- Score Equation : InverseLinear는 거리가 멀수록 점수가 떨어짐
+	- Scoring Factor : 점수에 그냥 곱하기 해주는 값(왜 만듬 ?ㅋㅋ)
+	- NormalizationType : Absolute VS RelativeToScores는 Absolute는 관찰자 기준으로 점수 메기고 후자는 관찰자에서 제일 가까이 점수 메긴거를 기준으로 점수를 메김
+	- Reference Value : 준 값에 대해 관찰자 기준으로 월을 만들어서 거기가 그 원에 가까울수록 점수가 낮음(원래는 점수가 높아야 하는데 반대인 상황, Linear, InverseLinear로 바꿀 수 있으니 쓰는덴 지장없음)
+	- Clamp : 특정 범위에 대해 낮으면 0점, 높으면 만점 -> InverseLinear이면 반대일 듯 ?
+
+	- Test는 여러 Test를 붙여서 가능하고 붙여놓고 On/Off도 가능
+
+=====
+0510
+=====
+	1. EQS의 ScoringFactor는 다중 test에서 어떤 test에 중요도를 더 줄지에 필요할 수 있음
+
+	2. Clamp와 NormalizationType(RelativeToScores)가 같이 사용됐을 때 Clamp의 Min으로 설정한 값부터가 0이 아닐 수가 있음
+	- Min이 100이여도 제일 가까운 아이템이 120이라면 120이 0점으로 채점될 수 있다는 뜻
+
+	3. 개인적으로 이 기능을 도망가는데 써야한다면 Linear 계열(Distance가 멀수록 채점 점수가 높아지는 경우) 중에서 골라놓고 Clamp Min으로 사용하면 괜찮을 듯
+	- 혹은 반대로 Inverse Linear 계열을 사용하고 Clamp Max만 걸어놓고 쓰면 최적화에 도움될 듯
+
+	4. Querier와 Item 간에 서로 Trace를 쏴서 그 중간에 걸리는 게 있는지 없는지로 점수를 메기는 Test도 있는데
+	- Querier : BT가 돌리는 주체
+	- Item : EQS에 의해 생겨난 초록 덩어리들(디버깅 시 보이는)
+
+	- Querier -> Item으로 Trace를 쏠지 Item -> Querier로 Trace를 쏠지를 정할 수 있긴한데 (사실 의미가 있나 싶고) 이거 말고 중요한 옵션 중에
+	- <Bool 일치>라는 옵션이 있음 -> 이게 Trace가 막히면 점수가 1점일지 0점일지를 정하는 옵션(Bool일치 체크를 풀어야 막힌 Item이 0점 처리 됨) - Hit가 나면 True임(Bool일치가 true면 Hit가 나면 1점)
+	
+	- Trace가 Hit일때만 되게끔 하는게 있었는데 체크를 풀고나서 overlap으로 설정해놓은 대상과 Trace가 안 됐음(예상과 다름)(OnlyBlockingHit)(뭔가 모르는 게 있는 듯)
+
+	- Trace를 어느 위치에서 쏠지, Item의 Z Offset을 얼마나 줄지도 있음(DataBinding이 가능하고 여기서 Parameter 설정이 되는데 이  EQS에 접근하는 법만 알면 외부에서 세팅 가능할 듯)
+
+	5. Enemy가 죽고 나서 죽는 몽타주를 재생하고 누운 상태로 나를 향해 Rotate하는데
+	- 이게 왜 이러냐면 죽는 몽타주가 재생중에도 Target은 나(Player)로 잡혀 있고 BT의 Rotate가 실행되기 때문임
+	- Target을 풀어주면 되는건데
+	- Component의 Deactivate 함수로는 인지가 안 풀렸음
+	- AIPerception의 SetSenseEnabled에서 시각의 Enabled를 false로 하겠다라는 방식은 적용은 됨(하지만 이게 Enemy쪽이기 때문에 상속받을 애들이 다른 감각을 가질 수 있기 때문에 범용적이지 않음)
+	- 결국은 Component를 파괴하는 방식으로 작성함(Destroy Component)
+
+	6. 기존에 처리안했던 부분인데 죽으면 Spawn후 몸에 붙여놨던 무기, 스킬들을 다 지워줌
+	- AnyDamage에서 Died로 상태가 변해 DestroyActor가 되기 직전에 지워 줌
+
+	7. VisualStudio 프로파일링 방법
+	- 디버그 - 성능 프로파일러 - CPU사용량, GPU사용량 체크 -> 게임 플레이 -> wait... -> 결과 분석
+
+		7.1) 확인 가능한 정보들
+		- 시간마다 프레임이 얼마나 나오는지
+		- 어떤 함수가 전체 게임 시간 중 부하가 많았는지(%로 표시)
+		- 특정 함수 안에서 불린 함수들에 대해서도 부하가 얼마나 걸렸는지
+		
+		7.2) 그래픽 디버깅 ( 디버그 - 그래픽 디버그 시작 )
+		- 한 프레임에 대해 어떤 Draw콜이 있었고
+		- 각 Draw콜이 pipeline에서 어떻게 그래픽이 만들어졌는지(그림으로 확인 가능)(파이프라인 단계 창을 켜야 함)
+		- Constant Buffer, VertexBuffer 등 GPU로 넘어가는 버퍼들도 확인 가능한 듯
+
+	8. 결국 생각을 더 해보니 내 게임의 지연의 원인은 몬스터가 많아졌을 때 돌아가는 Behavior Tree가 Tick으로 돌아가는 것이 원인인 것 같음
+	- BT 경량화
+	- 혹은 몬스터 마릿수 제한
