@@ -74,4 +74,7 @@ Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
 
   26. Actor의 Tick과 Component의 Tick은 별개임
   - 최적화를 위해 돌아가지 않는 Tick은 꺼주는 게 좋음
+
+  27. stat FPS, stat Game, stat GPU 등으로 프로파일링 가능
+
 */
