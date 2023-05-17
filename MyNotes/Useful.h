@@ -67,5 +67,11 @@ Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
 
   24. 언리얼 에디터에서 인게임에서(맞나?) ` 누른 후 <help> 치고 <프로파일링> 관련 찾아보자(20230510, spawn 혹은 BT의 Tick 관련해서 lag이 생김)
 
+  25. StaticMesh Component를 액터에 기본으로 추가하게 되면 <모빌리티 - 무버블> 인데 여기에 옵션으로 CastShadow도 True로 켜져 있으면
+  게임 실행 중에 GPU 계산을 많이 잡아먹게 됨
+  - <모빌리티 - 스태틱>으로 변경하여 라이팅 맵을 미리 계산하여 런타임 중의 비용을 줄일 수 있음
+  - 혹은 CastShadow를 꺼서 해결 가능
 
+  26. Actor의 Tick과 Component의 Tick은 별개임
+  - 최적화를 위해 돌아가지 않는 Tick은 꺼주는 게 좋음
 */
