@@ -77,4 +77,20 @@ Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
 
   27. stat FPS, stat Game, stat GPU, profileGPU 등으로 프로파일링 가능
 
+  28. 셰이더 컴파일 후 생길 목적 파일은 프로젝트 단위로 소유하고 있는 것이 아님
+  - https://blog.naver.com/ryumr/221334719805
+  - 위 링크에 잘 설명되어 있음
+  - 핵심은 엔진 설치 경로에 DerivedCachedData 폴더에 .ddp 형식으로 저장되어 있기 때문에 작업 프로젝트를 옮겨서 실행하게 되면 최초 1번 옮긴 컴퓨터에서 엔진 설치 경로에
+  셰이더 컴파일한 목적파일을 갖고 있게 됨
+  - 프로젝트 폴더 단위로 컴파일된 셰이더의 목적파일을 가질 수 있게끔 설정하는 방법은 위 주소에 나와있고 이를 했을 때의 장점은 다른 작업자 간 그 목적파일이 있다면 셰이더 컴파일을 하지 않아도 되고
+  단점은 프로젝트의 용량이 커진다는 것임
+
+  29. Behavior Tree를 실행하기 위해 RunBehaviorTree를 할 수 있으나 StopBehaviorTree는 없음
+  - 실행 중인 Behavior Tree를 멈추기 위해서는 Behavior Tree Component의 부모 클래스인 Brain Component에서 StopLogic을 통해 멈출 수 있음
+  - 재시작하기 위해서는 RestartLogic, 시작하기 위해서는 StartLogic
+  
+  - 참고 : RunBehaviorTree에 None을 인자로 넘겨도 멈추지 않았고 Behavior Tree Component의 Deactivate를 사용해도 멈추지 않았었음
+
+  30. Timeline Component를 정방향으로 Play하고 나서 끝까지 가고 나서 Reverse가 없는 상황에는 SetTime을 0으로 하여 초기화 해 주어야 하는 경우가 있을 수 있음
+
 */
