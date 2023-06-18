@@ -201,7 +201,8 @@
     <ClInclude Include="MyNotes\Portpolio\DADemo\SequenceOfTheWork\7_MainTower.h" />
     <ClInclude Include="MyNotes\Portpolio\DADemo\SequenceOfTheWork\8_MainTowerUIAndMainUI.h" />
     <ClInclude Include="MyNotes\Portpolio\DADemo\SequenceOfTheWork\9_CameraViewForEntire.h" />
-    <ClInclude Include="MyNotes\Useful.h" />
+    <ClInclude Include="MyNotes\Usefule_Cpp.h" />
+    <ClInclude Include="MyNotes\Useful_BluePrint.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />

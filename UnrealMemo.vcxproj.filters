@@ -17,7 +17,7 @@
     <ClInclude Include="Class_Month\March\0315.h" />
     <ClInclude Include="Class_Month\March\0316.h" />
     <ClInclude Include="Class_Month\March\0317.h" />
-    <ClInclude Include="MyNotes\Useful.h" />
+    <ClInclude Include="MyNotes\Useful_BluePrint.h" />
     <ClInclude Include="Class_Month\March\0321.h" />
     <ClInclude Include="Class_Month\March\0322.h" />
     <ClInclude Include="Class_Month\March\0323.h" />
@@ -64,6 +64,7 @@
     <ClInclude Include="Class_Month\May\0509.h" />
     <ClInclude Include="Class_Month\May\0510.h" />
     <ClInclude Include="Class_Month\May\0512.h" />
+    <ClInclude Include="MyNotes\Usefule_Cpp.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />
