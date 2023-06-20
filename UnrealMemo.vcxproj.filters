@@ -67,6 +67,7 @@
     <ClInclude Include="Class_Month\May\0512.h" />
     <ClInclude Include="MyNotes\Usefule_Cpp.h" />
     <ClInclude Include="Class_Month\June\0619.h" />
+    <ClInclude Include="Class_Month\June\0620.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />
