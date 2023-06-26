@@ -35,4 +35,9 @@
 	- AABPlayerController::OnPossess(APawn* aPawn);
 	- AABPawn::OnPossessedBy(AABController* NewController);
 	- AABGameMode::PostLogin의 끝
+
+	7. vs가 정신을 못 차리면 에디터의 <파일 - visual studio 새로고침>하면 vs가 정신차릴 수 있음
+	- 해봄직 한거지 이것도 믿음직스럽지 못함
+
+
 */
