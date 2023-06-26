@@ -27,4 +27,12 @@
 	- C++을 빌드 후 나오게 되는 모듈은 이전 모듈을 덮어쓰는 방식이 아니라 모듈의 이름 뒤에 숫자를 붙이 새로운 파일로 생성됨
 	- 핫리로드는 결국 새로운 파일로 생성된 모듈로 갈아끼우는 것
 	- 이런 식으로 생성된 모듈들은 에디터가 종료되면 자동으로 제거된다고 함
+
+	6. 게임 세팅 순서
+	- AABPlayerController::PostInitializeComponents();
+	- AABGameMode::PostLogin(APlayerController* NewController);
+	- AABPawn::PostinitializeComponents();
+	- AABPlayerController::OnPossess(APawn* aPawn);
+	- AABPawn::OnPossessedBy(AABController* NewController);
+	- AABGameMode::PostLogin의 끝
 */
