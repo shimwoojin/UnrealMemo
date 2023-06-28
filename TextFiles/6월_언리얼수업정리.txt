@@ -177,3 +177,318 @@
 0621
 ======
 
+	1. UFUNCTION 지정자 중 BlueprintNativeEvent를 사용할 때 <함수이름_Implementation> 이라는 이름의 함수를 새로 정의해주어야 하는데
+	- BlueprintNativeEvent 키워드가 붙게 된 함수는 <문서이름.gen.cpp>에 기본 구현을 갖게 됨 -> 이 파일의 경로는
+	C:\UnrealProjects\<프로젝트이름>\Intermediate\Build\Win64\UE4Editor\Inc\<프로젝트이름> 임
+	- generated 파일은 언리얼 헤더 툴이 우리 파일을 분석해서 자동으로 만들어주는 파일로 알고 있음 -> 작성한 헤더들의 맨 밑에 generated.h를 추가하는 이유이기도 함
+	- 그 구현의 내용은 C++ 버전으로 호출할 땐 <함수이름_Implementation>을 호출하고
+	블루프린트에 오버라이딩 된 구현이 있다면 그 내용을 호출한다는 뜻
+
+	- 하여 우리는 BlueprintNativeEvent를 사용하여 C++에 기본 구현을 갖고 블루프린트로 오버라이드하여 사용하고자 하는 경우가 있다면
+	
+	기본 함수는 구현을 비워두고 ( gen.cpp에서 이미 <함수이름_Implementation>을 부르기로 약속돼 있음 )
+	<함수이름_Implementation>을 정의부와 구현부를 마련해두어야 함
+
+	이 때 <함수이름_Implementation>에는 어떠한 지정자도 사실 의미가 없는 것이(어떤 것은 있을수도) 블프에서 오버라이드 안 할 시 이 함수를
+	부르게 되는데 블프 관점에서 노출된 함수는 <함수이름> 이기 때문 -> <함수이름>이 내부적으로 <함수이름_Implementation>을 부르는 것
+
+	하여 리플랙션 기능을 이용하고 싶다면 블프에 노출될 함수인 <함수이름>을 통하는 것이 의도와 맞을 듯
+
+	추가로 virtual은 C++의 그것과 같음
+
+	2. BlueprintNativeEvent 키워드를 적은 후 함수 본체의 구현부를 만들고 빌드를 해봤을 때 아래와 같은 오류 목록이 나옴
+	- C2084 : '함수이름' 함수에 이미 본문이 있습니다. / 파일 : MyActor.gen.cpp
+
+	- 위에서도 적어놨지만 BlueprintNativeEvent 키워드가 붙는 순간 엔진에서 그 함수의 기본 구현은 gen.cpp에도 적히게 됨
+	- 그걸 한 번 더 정의하려고 했을 경우 위와 같은 오류가 나는 것
+
+	- 그렇기 때문에 BlueprintNativeEvent 키워드가 붙은 함수는 구현부만 작성하고 추가로 _Implementation 키워드를 붙인 함수를 따로 작성하는 것
+
+	- BlueprintImplementableEvent는 구현부만 작성하고 노터치
+
+	3. 2번과 마찬가진데 본체의 구현부는 빼고 빌드를 하게 되었을 때도 오류가 나는데
+	- LNK2001 : 확인할 수 없는 외부기호
+
+	- 위 상황이 의미하는 바는 <함수이름_Implementation>이 작성되어 있지 않기 때문
+
+	- gen.cpp에 자동으로 작성해 준 우리의 <함수이름>에는 C++ 기본구현만 되어있으면 <함수이름_Implementation>을 부르도록 되어있는데 이 정보를 찾을 수 없기 때문에 링크에러가 나는 것
+
+	4. 오류 목록에서 확인하기 힘든 경우
+	- <출력>을 살펴보면 됨
+
+	- BlueprintNativeEvent가 붙은 함수에는 Virtual 키워드를 못 붙임
+	- _Implementation이 붙은 함수는 Virtual 키워드가 가능함
+	- 하지만 C++에서 상속관계를 가질 것이 아니고 상속을 하더라도 그 자식이 다른 구현을 가질 것이 아니라면 '굳이'가 되겠음(지양하는 편이 낫다라는 것은 virtual을 적음으로서 생기는 부하가 있다고 알고 있음)
+
+	5. 클래스를 리플랙션 시키기 위한 키워드(혹은 지정자)인 UCLASS()를 알아보자
+	- UCLASS를 알아보기에 앞서 언리얼의 모든 클래스는 월드에 배치됨과 상관없이 인스턴스를 하나씩은 무조건 가짐
+	- 이 말인 즉슨 C++의 추상 클래스가 불가능하다는 뜻
+	- C++ 문법 상 추상 클래스가 성립하기 위해선 1) 멤버 함수 중 순수 가상 함수가 하나 이상 있을 것 2) class name 뒤에 abstract 키워드를 통해 가능(둘 중 하나만 하면 됨)
+	- 그렇기 때문에 언리얼에선 이 문법이 불가능함 + 순수 가상 함수도 가질 수 없음( = 0; 혹은 abstract; )
+
+	- 위의 얘기를 정리하면 언리얼 클래스는 C++식 문법으론 1) 추상 클래스가 불가능 2) 순수 가상 함수가 불가능 이라는 것
+
+	- 언리얼식 문법으로 추상 클래스를 하기 위해선
+	- UCLASS(Abstract)
+
+	- 언리얼식 문법으로 순수 가상 함수를 하기 위해선
+	- 함수의 이름 뒤에 PURE_VIRTUAL(함수이름, ...)
+	- virtual int PureVirtual() PURE_VIRTUAL(AMyActor::PureVirtual, return 0;)
+
+	#define PURE_VIRTUAL(func, __VA_ARGS__) 는 결국 매크로인 것이고
+	이것이 순수 가상 함수로서 동작할 수 있는 원리는
+	순수 가상 함수 : 자식 클래스에선 부모의 순수 가상 함수를 무조건 재정의(오버라이드)하지 않으면 안됨 -> 정의하지 않을 경우 에러가 뜨거나 빌드가 불가능
+	결국 오버라이딩을 해야 하는 것에 목적을 두어 기본 구현이 불리게 되면 static_assert가 불리게 됨(기본 구현을 부르면 안 된다는 뜻, 오버라이드를 강제함)
+	그리고 이 때 첫 번째 인자로 넘겨주는 func은 # 연산자를 통해 문자열로 변환되어 static_assert의 경고 문구의 일부분이 됨(이것이 순수 가상 함수이고 어떤 함수이름인지 나타내기 위한 경고 문구)
+
+	- 수업 중에 return 0;가 필요 없는 것 아니냐 했는데 int가 반환형이라면 return 값이 있긴 있어야 하겠음 -> static_assert에 대해 무시하고 진행하게 되면 정상진행 될 수도 있기 때문
+	- LowLevelFatalError는 프로그램을 중단한다고 함 -> 무시하고 정상 진행은 안 되는 듯
+
+	- 가변인자의 공간은 return이기 보다는 추가적인 내용(메시지를 더 쓴다거나)을 적기 위한 공간 정도
+
+	6. 기본적으로 UPROPERTY 혹은 UFUNCTION은 public 혹은 protected에 적게 되는 경우가 많은데
+	- 프로젝트 구조 상 private에 정의해야 하나 블루프린트에서 call할 필요가 있는 경우 사용할 수 있는 meta 지정자가 있음 -> meta = (AllowPrivateAccess)
+
+	- 다른 프로퍼티들과 함께 쓰게 되면
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess)
+
+	- 사실 C++에서 기본 구현을 갖고 블루프린트는 C++를 상속받으면 되는데 그렇기에 드는 생각이 위의 private을 허용하는 메타지정자를 사용하기 보단 protected로 접근 지정자를 제한하여
+	블프에선 접근을 허용하는 것은 어떤가 싶기도 함
+
+	7. 추가로 UFUNCTION, UPROPERTY에서 getter랑 setter를 지정하는 키워드 BlueprintGetter, BlueprintSetter, BlueprintGetter = "BlueprintGetterName", BlueprintSetter = "BlueprintSetterName"을 사용해봤는데
+	- 과제로 했던 EditByIntRef에서 위 키워드를 추가한 변수가 값이 바뀌지 않았었음
+	- 언젠간 알아보는 걸로
+
+	8. class UStaticMeshComponent* Mesh;
+	- 포인터 변수(64비트 환경에선 8바이트)에 대해선 전방선언을 통해 헤더의 추가 없이 변수를 선언 가능함
+	- class 키워드가 없다면 UStaticMeshComponent를 구현할 수 있는 클래스를 가진 헤더를 추가해야 할 것
+
+	- 이 방법이 IWYU(Include What You Use)의 원칙임
+	- 헤더는 전방선언을 하고 cpp에서 실제 구현 혹은 사용할 헤더를 추가해서 사용하는 것
+
+=====
+0622
+=====
+	1. UPARAM(ref)를 사용하여 블프와 C++에서 input 인자에 대해서 수정이 가능하게끔 설계 할 수 있음 -> 납득이 안 가는 부분은 UPARAM(ref)가 없을 때 C++에선 인자를 받아야 사용가능한 함수이지만
+	블프에서는 인자로 받는 input이 아닌 output으로서 출력이 되는 다른 함수로 사용되게 됨
+	- 이 부분에 대해서 엔진에선 어떻게 활용하는지를 좀 더 알아볼 필요가 있겠음
+	
+	2. 래퍼런스에 대해서 좀 더 알아보면 일단 래퍼런스를 쓰는 이유 2가지 -> 1) 반환하기 위해(값의 수정) 2) 인자 전달의 경량화
+	- 위 2가지 경우에 대해서 구분하는 방법은 프로그래머의 의도로 작성된 const 지정자임
+	- 경량화를 위한 래퍼런스는 const 지정자를 붙이게 됨
+
+	3. const의 사용은 크게 3가지로 나뉨 -> 1) 원본의 수정을 막는 const (const int* a; 혹은 int const * a;) 2) 주소의 수정을 막는 const (int * const a) 3) 멤버변수의 수정을 막는 함수 뒤에 붙는 const
+	- 위는 포인터와 같이 쓴 const에 대해서 나열했고
+	- 래퍼런스에 대한 const는 위 2번의 특징을 기본으로 갖고 있는 const임(래퍼런스는 선언과 동시에 어떤 주소를 물고 있어야 하고 이 값은 수정 불가능함 -> 이 사실이 사실은 *const였던 거임)
+
+	4. void TestFunction(const int& testInt)에 대해서 블프의 함수가 되게 된다면
+	- 위 함수는 수정 반환이 아닌 경량화의 목적이므로 블프에서 핀이 input으로 받아지게 됨
+	
+	5. Actor는 RootComponent가 없다면 Transform이 없음
+	- SetRootcomponent(루트가 될 컴포넌트); 혹은 RootComponent = 루트가 될 컴포넌트; 를 해주면 됨
+
+	6. 루트를 정하고 루트 밑에 다른 컴포넌트를 붙이는 식으로 액터가 구성되는데 붙이는 작업이 이루어지지 않는다면 안 붙은 컴포넌트는 자유 분방한 트랜스폼을 갖게 됨
+	- 불일 컴포너트->SetUpAttachment(루트컴포넌트의이름); 혹은 불일 컴포넌트->SetUpAttachment(GetRootComponent()); 혹은 루트에 붙이기 않겠다면 불일 컴포너트->SetUpAttachment(붙고 싶은 컴포넌트의 이름);
+
+	7. CreateDefaultSubobject를 통해 생긴 컴포넌트의 이름은 겹치면 안 됨
+
+	8. 리플랙션이 없게 되면 블프 에디터에서 디테일 탭이 안 보이게 됨
+	- 이러한 현상을 가지는 컴포넌트가 있는데 Character 밑에 달린 Arrow Component가 이러함
+	- Arrow는 정면을 바라보는 것을 강요하기 위함인듯
+	- Arrow도 리플랙션을 켜게 되면 사실 많은 정보를 가지고 있음
+
+	9. 컴포넌트 변수에 대해 UPROPERTY 지정자는 VisibleAnywhere가 관습적으로 많이 붙게 됨
+	- VisibleAnywhere라고 해서 블프에서 디테일 탭의 편집이 불가능한 것이 아님
+	- EditAnywhere인 경우 물고 있는 포인터 주소가 바뀔 수 있는 것이라 알고 있었는데 VisibleAnywhere도 가능한 것으로 보임
+
+=====
+0623
+=====
+	1. 심볼을 보고 부모의 접근 지정자를 알 수 있음
+	- public : 우측 하단에 암것도 x, proteced : * , private : 자물쇠로 잠겨 있음
+	
+	2. Setter, Getter는 있으면 이걸로 쓰자
+	- SetRootComponent만 해도 부모의 proteced 변수 RootComponent에 값을 주는 것 뿐이지만 SetRootComponent() 함수를 통하면 추가적인 작업을 거쳐줌
+
+	3. CreateDefaultSubobject, SetupAttachment등의 함수는 생성자에서만 쓸 수 있는 Construction 함수임
+	- CretaeDefaultSubobject에 대응하는 NonConsturction 함수는 NewObject 임
+	- Actor는 GetWorld()->SpawnActor()
+
+	4. Root = CreateDefaultSubobject<USceneComponent("Root"); 라 했을 때
+	- 템플릿 함수의 반환 값을 Root인 포인터에 반환 받는 것임
+	- 위의 경우 USceneComponent를 명시하였지만 템플릿 함수 중에 인자로 USceneComponent를 받는다고 가정하면 템플릿 인자 없이도 타입 추론이 가능함
+	- 위의 경우는 인자로 받는 USceneComponent 인자가 없기 때문에 우리는 템플릿 인자를 직접 지정해줘야 함
+
+	5. 고급 코딩을 하기 위해 매크로를 잘 써보면
+	- #define CreateDefaultSubObjectAuto(Component)\
+	Component = CreateDefaultSubobject<>("#Component")
+
+	- 일단 위까지는 나도 쓸 수 있음 -> 하지만 템플릿 인자를 채워줘야 하는데 변수의 이름으로부터 무슨 타입인지를 알아내야 함
+
+	- decltype(*Component)까지 하게 되면 Component& 까지 받을 수 있음 -> 포인터 변수에 대해 역참조한 값을 decltype에 넣으면 왜 래퍼런스가 나오는지는 잘 모르겠음
+
+	- &를 떼줘야 하는 상황임
+	
+	- <type_traits> 헤더 추가해주고
+
+	- #define CreateDefaultSubObjectAuto(Component)\
+	Component = CreateDefaultSubobject<std::remove_reference<decltype(*Component)>::type>("#Component")
+
+	- #define CreateDefaultSubObjectAuto(Component)\
+	Component = CreateDefaultSubobject<std::remove_reference_t<decltype(*Component)>>("#Component")
+	
+	- 저 구조체의 헤더를 까보면 멤버변수 중에 type이라는 변수는 래퍼런스가 떼진 본래 타입을 갖는 변수임
+
+	6. 익명구조체도 decltype을 통해 재사용할 수 있음
+	- struct
+	{
+	int i1;
+	int i2;
+	} ii;
+
+	decltype(ii) ii2;
+
+	7. #define PI 3.14 는 컴파일 이전에 수행(전처리)되고 컴파일 코드에는 3.14가 적혀있어서 추적이 불가능함
+	- const 변수를 활용
+
+	8. 생성자 기본 생성 시 tick을 켜주는 코드도 자동으로 적히는데 이 코드를 지워주게 되면 Actor의 tick은 작동하지 않음
+	- Actor에 붙은 Component와는 별개
+
+	9. 엔진의 입장에서 tick에 대해 크게 2가지로 구분하면 1) 게임 tick 2) 엔진 tick
+	- 엔진 tick 중 collision에 대해서 간단하게 이해하면 collision 관련해서 누구랑 누구랑은 block일거고 누구랑은 overlap일거고 정해놓은거에 대해 매 프레임 실제로 actor끼리 충돌했나 확인해보고
+	충돌했으면 각 actor들에게 '너 충돌했음', '너 겹쳤음'을 callback으로 보내주는 느낌
+
+	10. 에셋을 바인딩해주는 4가지 방법
+	- 1) 블프에서 직접 2) 소프트 래퍼런스 3) ConstructorHelpers::FObjectFinder<형식> 변수명(경로) 4) 블프에서 적용한(혹은 적용할) 에셋을 C++에서 ConsturctionScript에서 적용
+	- 위 4가지보다 사실 FM은 생성자에서 AssetManager를 활용하는 것(하지만 굉장히 고급이니깐 엄청 나중에 해보도록)
+
+	11. 소프트 래퍼런스란 ?
+	- 경로를 물고 있는 것
+	- 이 변수를 활용하려면 로드해서 그 결과물에 대해 활용 가능함
+	- 동기 혹은 비동기를 고를 수 있는데(동기는 우리의 게임 시간과 같은 타임라인, 비동기는 다른 타임라인(다른 스레드일 듯))
+	- 비동기를 사용함에 있어 결국 Completed 핀을 활용해야 하는데 Completed 이전에 변수를 활용하려면 None임
+
+	- C++ 변수로 표현하게 되면 TSoftObjectPtr<>(소프트 오프젝트 래퍼런스), TSoftClassPtr<>(소프트 클래스 래퍼런스)
+
+	12. 언리얼에선 멤버 변수를 덮어쓰는 지역변수가 불가능함(혹은 인자도 같은 이름 허용이 안됨)
+	- this가 굳이가 되버리는
+
+	13. C++과 블프를 같이 활용함에 있어서 C++의 생성자는 블프에 설정해둔 값을 읽어올 수 없음
+	- 최소 ConstructionScript 혹은 Beginplay는 되어야 함
+
+	14. void OnConstruction(FTransform const& Transform) override;
+	- ConstructionScript의 C++ 버전 이름
+
+	15. Ctrl + . -> 정의 만들기는 남발하지 말자 ㅋㅋ
+	- 인텔리전스가 다 읽고 나서 해야 바로 만들어짐
+
+	16. Super는 습관화 -> 부모의 함수를 물려받았다면
+	- 빈 부모의 함수라도 오버헤드보다 우리 게임이 잘 돌아가는 걸 생각한다면,,
+
+	17. 빌드 중에 오류가 날 것 같다면 빌드 취소 -> ctrl + break / 빌드 : ctrl + shift + b
+
+	18. 위의 ConstructorHelpers::FObjectFinder<>의 NonConsturction 버전은(NonConstruction이라 함은 생성자가 아닌 이라 볼 수 있음)
+	- UStaticMesh* MyMesh = LoadObject<UStaticMesh>(this, TEXT("StaticMesh'/Game/Cube.Cube'"));
+	- UObject* MyMesh2 = StaticLoadObject(UstaticMesh::StaticClass(), this, TEXT("StaticMesh'/Game/Cube.Cube'"));
+
+====
+0626
+====
+	1. 언리얼 마법사를 통하지 않고 에디터와 소통할 수 있는 헤더와 CPP를 만들 수 있음
+	- Source 폴더 하위에 헤더와 CPP를 추가하고 CoreMinimal.h, 상속받은 부모의 헤더, generated.h(UCLASS 키워드가 붙는 클래스라면)를 추가해주면 됨
+	- 언리얼 마법사를 통하게 되면 헤더와 CPP도 만들지만 빌드도 하기 때문에 시간이 걸리는 측면이 있음
+	- 빈 Actor를 미리 만들어두고 경로만 잘 잡아서 만든 헤더와 CPP에 복붙해넣는 방식도 괜찮다고 함
+
+	2. 언리얼 마법사가 우리의 클래스를 만들어주는 비밀을 조금 알아보면
+	- C:\Program Files\Epic Games\UE_4.26\Engine\Content\Editor\Templates 이 경로에서 <.template> 확장자를 가진 파일들을 메모장으로 열게 되면
+	우리가 클래스를 만들면 제공할 틀이 잡혀 있음
+	- %와 %사이에 적어둔 환경 변수를 통해 우리가 정할 클래스 이름 혹은 ClassName.generated.h의 접두어를 빼는 등에 대해서도 대응하여 만들어지는 것
+
+	3. int32는 언리얼의 4byte 정수형을 의미함
+	- 멀티 플랫폼에 대응하기 위한 흔한 기법임
+	- 플랫폼이 다르면 같은 자료형 이름이여도 byte수가 다를 수 있음(상대적인 크기만 지정한다고 함)
+	- byte수가 다르게 되면 문제점이 있는데 1) Overflow, 2) 구조체 등을 다룰 때 주소로 접근하는 코딩은 불가능해짐
+	
+	- window를 예를 들면 우리가 추가하고 있는 헤더 중 어딘가에
+
+	#if defined _WIN64
+	typedef unsigned int uint32;
+
+	이런 느낌으로 적히게 됨
+
+	4. UE_LOG(LogCategoryName, Verbosity, 하고 싶은 말, ...) 에서 LogCategoryName을 우리가 직접 정의할 수 있음(2가지 방법)
+	- 1번 방법 : cpp파일에 DEFINE_LOG_CATEGORY_STATIC(GPC, Log, All)
+	- 2번 방법 : cpp파일엔 DEFINE_LOG_CATEGORY(GPC), 헤더 파일엔 DECLARE_LOG_CATEGORY_EXTERN(GPC, Log, All)
+
+	1번은 해당 cpp파일에서만 쓸 수 있고
+	2번은 헤더를 추가한 곳이라면 어디든 사용 가능함
+
+	- 위의 함수 이름에 적힌 STATIC은 다른 파일에서 사용이 불가능함을 알리는 전역에서의 static의 의미를 담고 있음
+
+	5. static과 extern을 좀 더 알아보면
+	- 같은 프로젝트 내 다른 cpp파일이지만 같은 변수명을 사용하게 되면 빌드 오류가 나게 됨(각각의 cpp파일은 각각의 obj 파일을 만들지만 obj 파일이 모여 만든 exe파일(혹은 lib 혹은 dll)을 구동함에 있어 문제가 생김)
+	- 이 때 등장할 수 있는 키워드가 extern임 -> 다른 cpp에서 전역 변수를 사용하고 싶으면 extern 키워드를 붙여 사용해주면 됨
+	- 근데 이 extern을 막아주는 키워드가 static임 -> static이 붙은 전역 변수를 extern이 불가능함
+
+	- 함수에는 extern이 기본으로 포함(생략)되어 있음
+
+	6. 전역변수에 대해 이름이 겹칠 경우 <::변수이름> 으로 구분지을 수 있음
+	- 전역의 namespace는 비어 있게 사용
+
+=====
+0627
+=====
+	1. FString은 TCHAR형으로 형변환(정확히는 형변환은 아님)해서 사용하기 위해 2가지 방법이 있음(TEXT()의 경우 TCHAR를 요구함)
+	- 1) Data.GetCharArray().GetData() 2) *Data
+	- 2번 방법은 *에 대해 연산자 오버로딩이 된 것
+
+	2. FVector, FRotator 등엔 ToString()이라는 알아서 FString으로 반환해주는 함수가 있음
+
+	3. UObject는 각각 FName을 가지고 FName은 ToString으로 변환해서 사용 가능
+
+	4. Rotator는 받는 인자가 pitch, yaw, roll 순
+	- 주석을 달 때 매개변수마다 주석을 다르게 달아줄 수 있는데
+	- @param <매개변수 이름> <주석 내용>
+
+	5. 블프의 PrintString처럼 화면에 띄우기 위한 함수는(log가 아닌)
+	- GEngine->AddOnScreenDebugMessage(); 매개변수는 아래서 설명
+	- key, 띄울 시간, 색, 메시지 등은 필수로 넘겨주야 하고 디폴트 매개변수로 잡혀있는 값이 있음
+	- key는 각 메시지에 대해 Channel임 -> 띄워질 위치가 정해진다는 뜻
+	- key의 기본값 -1은 Channel 없이 다른 Channel이 적혀있건 관계없이 쭉 밀어 냄
+	- 디폴트 인자 중에 bNewerOnTop이 있는데 쌓이는 순서에 대해 toggle하는 것
+	- 크기에 대해서도 디폴트 인자임
+
+	6. FPS장르를 다룰 때 상대는 내 전신이 보이고 플레이어는 본인의 손과 무기 정도만 보이면 되는데
+	- 이 때 플레이어에게 SkeletalMesh를 두개 주고 1) 상대에게 보이는 용도 2) 플레이어에게 보여질 용도로 나눈 뒤
+	- <디폴트 - 렌더링> 에서 OwnerNoSee, OnlyOwnerSee 등의 값을 조정하여 사용하는 기법도 있다고 함
+
+	7. 5번 얘기를 이어하자면 화면에 띄울 메시지를 제외하고 key, 띄울 시간, 색에 대해선 디폴트 매개변수를 주고자 하는데
+	- 여러 함수에 같은 값을 주어 초기화를 하는 내용이기 때문에 1) static const 변수 2) 매크로 를 활용하여 이 내용의 유지보수성을 올릴 수 있는데
+	
+	- 상수성에 대해 define을 하는 방법이 구식 방법이라 첫 시도엔 static const를 사용함
+
+	- 클래스 내의 static을 사용함에 있어 클래스 내에 변수를 static 키워드를 적어 붙여주고(초기화는 하지 않음)
+	cpp에 가서 static 키워드는 빼고 변수 이름 앞에 네임스페이스를 붙여 초기화를 해주면 됨(int같은 정수형이나 char형에 대해선 cpp가 아닌 클래스 내부에서도 초기화가 가능하다곤 함)
+
+	- 위 방법의 안 좋은 점은 함수에 마우스를 갖다 대어 기본값이 뭘로 설정되었나 확인하고자 할 때 한 눈에 확인이 어렵다는 점이 있음
+
+	- 위 방법에 대해선 매크로가 더 유리해보임(매크로는 함수에 마우스 갖다 대면 어떤 값인지 치환되서 볼 수 있음)
+
+	8. 대문자 변환 : ctrl shift u, 소문자 변환 : ctrl u
+	- 대문자 변환은 잘 안 쓰던 기능인데 매크로를 자주 코딩하게 되면 유용할 듯
+
+	9. 헤더의 끝에서 #undef 을 통해 그 매크로의 해제를 할 수 있으나 보통은 지양하는 게 좋음
+
+	10. FString::FromInt()로 int를 FString으로 바꿀 수 있었다면
+	- FString::SanitizeFloat()은 float을 FString으로 바꿀 수 있음(Sanitize는 '살균하다'의 의미 -> 쓸데없는 0을 떼줌, 굉장히 청결한 float인 듯 ㅋㅋ)
+
+	11. Logger::Print()를 정의함에 있어 GEngine->AddOnScreenDebugMessage()를 호출하며 오버로딩하는 형식으로 정의하였는데
+	- 이런 경우 GEngine->AddOnScreentDebugMessage()에 대해 한 단계 래핑하여 함수로서 관리해주는 것이 좋음(Internal 함수)
+
+	12. UKismetSystemLiberary::PrintString()은 우리가 알던 블프의 printstring임(#include "Kismet/KismetSystemLibrary.h"
+	- 우리가 Logger를 새로 정의한 이유는 log와 screen에 따로 쓸 함수를 분리함도 있으며
+	- 화면에 띄울 경우 key를 주어 가시성을 높여줌에 있음
+
+=====
+0628
+=====
