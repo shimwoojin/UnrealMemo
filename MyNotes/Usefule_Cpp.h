@@ -42,4 +42,9 @@
 	8. 영역감싸기 : ctrl k s
 
 	9. 레벨에서 alt drag는 복제
+
+	10. Montage_JumpToSection()은 Montage_Play()가 선행되어야 함
+	- JumpToSection이 인자로 넘겨받는 몽타주가 현재 play중이어야 의도한 결과를 얻을 수 있음
+	
+	11. Montage_IsPlaying()은 BlendOut이 진행되는 순간부터 false로 취급 되는 듯
 */
