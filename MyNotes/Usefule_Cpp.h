@@ -47,4 +47,6 @@
 	- JumpToSection이 인자로 넘겨받는 몽타주가 현재 play중이어야 의도한 결과를 얻을 수 있음
 	
 	11. Montage_IsPlaying()은 BlendOut이 진행되는 순간부터 false로 취급 되는 듯
+
+	12. 10, 11번 결론은 몽타주의 BlendOut이 진행되는 시점부턴 그 몽타주가 플레이 되는 것이 아님
 */
