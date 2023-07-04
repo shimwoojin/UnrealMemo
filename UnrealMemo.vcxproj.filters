@@ -77,6 +77,7 @@
     <ClInclude Include="Class_Month\June\0629.h" />
     <ClInclude Include="Class_Month\June\0630.h" />
     <ClInclude Include="Class_Month\July\0703.h" />
+    <ClInclude Include="Class_Month\July\0704.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />
