@@ -515,3 +515,169 @@
 	꽤나 우회해서 함수의 input 혹은 output으로 이벤트를 받거나 보낼 수 있음
 
 	- 함수 -> 이벤트로 전환은 <이벤트 생성> 노드를 이용
+
+=====
+0629
+=====
+	1. 과제 요약
+	- 함수 포인터 선언 방법 : 반환값 (*변수이름)(매개변수타입,...);
+	- 함수 포인터의 자료형화 : 1) typedef 반환값 (*자료형으로 쓸 이름)(매개변수타입,...); 2) using 자료형으로쓸이름 = 반환값 (*) (매개변수타입,...);
+	- #include <functional> : std::function<반환값(매개변수,...)> 변수 이름;
+
+	- 함수는 함수 이름 그 자체가 주소 -> 함수 포인터에 대입 시 &를 붙여도 안 붙여도 가능(멤버 함수는 & 강요됨)
+
+	- 멤버 함수를 담는 함수 포인터 : void (ADrawer::*begin_play)() = &ADrawer::BeginPlay;
+	위 포인터의 call : (this->*begin_play)();
+
+	2. std::function<void(ADrawer&)> fvd = &Adrawer::BeginPlay;
+	- 멤버 함수를 담는 함수 포인터의 std::function 버전
+	- call : fvd(*this);
+
+	3. std::function<void()> fvv = [](){};
+	- 람다 가능
+	- void(*fvv)() = [](){}; 얘도 가능
+
+	4. c 버전 함수 포인터와 std::function 버전 간 대입도 가능
+	- void (*funcptr)() = fvv.target<void(void)>();
+
+	5. std::function엔 functor도 담김
+
+	struct A
+	{
+		void operator()(){}
+	}
+	
+	A b;
+
+	- functor 호출 : b();
+	- functor를 함수 포인터에 담는 것 : void (*funcptr)() = b;
+	- call : funcptr();
+
+	- void (*funcptr)() = A(); 도 가능 -> 임시 객체를 넘겨줘도 가능
+
+	6. functor와 함수 포인터를 엮어 유용하게 사용하는 법
+	- 호출 시점에 구조체의 변수 값에 따라 functor를 엮어 놓은 함수 포인터의 결과를 다르게 하고 싶을 때
+
+	struct Sum
+	{
+		int i;
+		int j;
+
+		int operator()()
+		{
+			return i + j;
+		}
+	};
+
+	Sum sum;
+	sum.i = 5;
+	sum.j = 7;
+	std::function<int()> fiv = sum;
+	fiv();
+
+	- fiv가 불리는 시점에 i, j 값에 따라 결과가 달라질 수 있음
+
+	7. 위와 정반대의 성격으로 i,j를 함수가 binding 되는 순간의 값으로 묶어 버리는 방법이 있음(lambda)
+
+	int i = 5;
+	int j = 7;
+	std::function<int()> fvv = [i, j]()
+	{
+		return i + j;
+	}
+
+	- 위 fvv 함수가 다른 곳에 가서 불리고 i,j가 값이 바뀌었더라도 return의 결과는 12일 거임
+
+	8. 구조체와 functor, 함수포인터 등을 사용해서 누구의 함수를 부를지를 지정해 둘 수 있음
+
+	struct ADrawerBeginPlay
+	{
+		ADrawer* This;
+		std::function<void(ADrawer&)> BeginPlay;
+
+		void operator()()
+		{
+			BeginPlay(*This);
+		}
+	};
+
+	9. 8번의 방법을 std::bind로 쉽게 처리 가능
+	- std::function<void()> fvv = std::bind(&ADrawer::BeginPlay, this);
+
+	10. std::function<void()> fvv = std::bind(&ADrawer::Tick, this, 4.25f);
+	- std::bind가 위에서 한 일은 ADrawer::Tick(ADrawer* this, float DeltaSeconds)에 대해 this랑 4.25f라는 값으로 미리 값을 넘겨주고 매개변수가 없는 함수처럼 취급시켜줌
+	
+	- std::function<void(float)> fvv = std::bind(&ADrawer::Tick, this, std::placeholders::_1);
+	- std::function<void(ADrawer&)> fvv = std::bind(&ADrawer::Tick, std::placeholders::_1, 4.25f);
+
+	- std::placeholders::_1로 미리 안 채울 값에 대해선 땜빵으로 쓰는 게 가능(땜빵할게 많아지면 _2, _3,...)
+
+=====
+0630
+=====
+	1. NamedBox 클래스를 만듬
+	- UBoxComponent, UTextRenderComponent를 가짐
+	- Text에 대해 정렬을 어떻게 할지 정해놓은 열거자를 구분짓는 네임스페이스가 EHorizTextAligment::EHTA_Center, EVerticalTextAligment::EVRTA_TextCenter로
+	오타인가 싶음(SetHorizontalAlignment, SetVerticalAlignment)
+
+	2. ThisClass로 본인 클래스의 소속을 나타낼 수 있음
+	- ex. ThisClass::StaticClass(); 혹은 StaticClass();
+
+	3. Overlap에 바인딩을 하기 위해 Actor가 정의해놓은 델리게이트에 AddDynamic을 해주어야 하는데
+	- AddDynamic은 __Internal_AddDynamic을 포장한 매크로 함수여서 인텔리전스 검색이 안됨
+	- OnActorBeginOverlap.AddDynamic(this,&ThisClass::OnActorOverlapStarted);
+	- 우리가 정의한 바인딩할 함수의 타입은 반환값은 void이며 매개변수는 AActor*를 2개 받는 타입을 맞춰주어야 함
+	
+	4. AddDynamic이 아닌 Add를 사용하여 바인딩을 하고자 한다면 FScriptDelegate 타입을 인자로 넘겨주어야 하는데
+
+	FScriptDelegate SD;
+	SD.BindUFunction(this, "OnActorOverlapStarted");
+	OnActorBeginOverlap.Add(SD);
+
+	- 위 처리를 통해 AddDynamic과 같은 처리를 하지만
+	- Name으로 받는 방식이나 코드가 길어지는 단점이 있음
+
+	5. 내부적으로 AddDynamic도 &ThisClass::OnActorOverlapStarted로 받아서 내부적으론 함수 이름을 문자열 형태로 보관하긴 함
+	- 멤버함수의 경우 "::"의 문자열을 찾아 그 뒷부분만 함수이름으로서 저장하게 됨
+
+	6. AddDynamic으로 묶어줄 함수는 UFUNCTION()이어야 함
+
+	7. 추상클래스를 만드는 방법은 UCLASS(Abstract)이고 순수가상함수는 PURE_VIRTUAL(함수이름) 인데
+	- UObject밑으로 상속받은 객체들은 월드에 배치되지 않아도 인스턴스가 하나 이상 만들어지기 때문에 CPP의 기본문법이 사용불가능함
+	- 하지만 CPP의 abstract로 순수가상함수를 만드는 것이 아예 불가능하지만은 않음
+
+	8. NamedBox(사용자 정의 클래스)를 상속받은 DelegateTrigger 클래스를 언리얼 마법사로 만들게 되면
+	- Actor를 만들었을 때와 달리 추가해 준 내용이 빈약한데
+	- 특정 경로의 UObjectClass.h.Template의 내용을 편집해주면 됨(경로는 이전 내용에 있음)
+
+	9. VS 인텔리전스가 제공하는 부모의 순수가상 모두 구현은 언리얼 프로젝트에선 사용 불가능
+
+	10. 부모의 UFUNCTION을 붙인 내용은 자식에서 UFUNCTION의 오버라이드가 불가능함
+	
+	11. MSB 어쩌구 오류는 대체로 언리얼식 문법이 틀린 것임
+	- 혹은 명령이 종료되었습니다 일 경우
+	- 이럴 땐 출력 확인
+
+	12. 부모의 접근 지정자가 언리얼 마법사가 만들어 줄 경우 public인데 그 의미는
+	- 부모의 public, protected, private까지 접근이 가능하다는 뜻임(헷갈리는데 내용 재 확인 필요)
+
+	- 언리얼은 public이 강요됨(protected, private 상속이 불가능함)
+
+	13. C++는 C의 기본을 받아들이고 그 위에 덧쌓은 문법임
+	- Cast가 괄호로 하는 Cast와 Static_Cast 등의 추가적인 문법을 생각하면 됨
+
+	- .cpp와 .c는 빌드 방식이 다름
+	
+	extern "C"
+	{
+		void Text() {
+			_asm{}
+		}
+	}
+
+	- 호환을 위해선 위와 같은 문법이 가능함, 어셈블리어의 경우도 위와 같은 문법으로
+
+	14. 델리게이트의 선언 방법은
+	- TDelegate<void()> Trigger;
+	- 함수포인터의 typedef을 델리게이트 버전으로 쓰게 되면
+	- DECLARE_DELEGATE(FTriggerType)

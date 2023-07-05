@@ -49,4 +49,11 @@
 	11. Montage_IsPlaying()은 BlendOut이 진행되는 순간부터 false로 취급 되는 듯
 
 	12. 10, 11번 결론은 몽타주의 BlendOut이 진행되는 시점부턴 그 몽타주가 플레이 되는 것이 아님
+
+	13. rfor -> tab
+	- range 기반 for문 자동 완성
+
+	14. if(auto* cont Mesh = Cast<UStaticMeshComponent>(OutActor->GetRootComponent()) {}
+	- if 안 에서 변수 선언 및 대입까지 가능함
+	- C++ 몇 이상 부터 가능해진 것으로 보임
 */
