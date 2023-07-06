@@ -14,12 +14,14 @@
 
 	4. 조건을 표현하는데 있어서
 	1) if(PendingImpulseToApply.Z != 0.f || PendingForceToApply.Z != 0.f)
-	2) if( ! (PendingImpulseToApply.Z == 0.f && PendingForceToApply.Z == 0.f)
+	2) if( ! (PendingImpulseToApply.Z == 0.f && PendingForceToApply.Z == 0.f))
 
 	두 구문은 같은 의미를 같지만 강사님은 2번을 선호하신다고 함
 	사실 나는 1번이 더 잘 읽힘
 
-	5. Movement 계열의 ApplyRadialDamge를 좀 더 알아보면
+	5. Movement 계열의 ApplyRadialImpulse를 좀 더 알아보면
+	- Radial에 대해 처리 후 ApplyImpulse로 처리 됨 -> 이런 처리가 일원화이며 이런 구성이 좋은 구성
+
 	- 멤버 변수인 PendingImpulseToApply 변수를 한 프레임동안 팍 올렸다가
 	- Velocity에 더해준 후 PendingImpulseToApply는 다시 0값을 가지게 됨
 	- Pending이란 뜻이 '보류'라는 뜻을 가짐에서도 유추할 수 있으며 실제 엔진 내부에서도 위 설명과 같이 구현되어 있음
@@ -35,7 +37,7 @@
 	- 앞으로 언리얼헤더는 <>, 우리 프로젝트 헤더는 ""로 사용하여 구분짓기로 함
 
 	7. 애니메이션을 적용해주기 위해 AnimInstance를 상속하여 MyAnimInstance를 만듬(C++)
-	- 이 클래스가 해줄 작업은 블프에서 이벤트 그래프에서 처리해주던 변수들의 값을 바꿔주기 위함임
+	- 이 클래스가 해줄 작업은 블프 이벤트 그래프에서의 로직을 대신 처리하여 변수를 다루기 위함임
 	- BlueprintUpdateAnimation을 사용하여 매 프레임 업데이트 하던 내용을 C++로 처리해주어야 함
 
 	- BlueprintNativeEvent로 되어서 C++내용을 블프에서 오버라이드하는 식으로 처리할 줄 알았으나
