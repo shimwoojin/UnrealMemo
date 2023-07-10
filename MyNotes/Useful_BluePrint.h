@@ -93,4 +93,6 @@ Use Controller Rotation Yaw 옵션이 비어져 있어야 적용되는 듯
 
   30. Timeline Component를 정방향으로 Play하고 나서 끝까지 가고 나서 Reverse가 없는 상황에는 SetTime을 0으로 하여 초기화 해 주어야 하는 경우가 있을 수 있음
 
+  31. SkeletalMesh에 대해 부르는 'Montage 재생' 노드는 StopAllMontages = true가 기본 값임 -> 그 동안 우리가 몽타주 재생 중 다른 몽타주를 재생하면 방해를 받은 이유(Interrupted)
+  - (Mesh - GetAnimInstance)에 대해 PlayMontage는 StopAllMontages = false로 하여 몽타주의 동시 재생이 가능하게 함
 */
