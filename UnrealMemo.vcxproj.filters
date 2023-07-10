@@ -6,6 +6,7 @@
     <Text Include="TextFiles\에셋정리.txt" />
     <Text Include="TextFiles\5월_언리얼수업정리.txt" />
     <Text Include="TextFiles\6월_언리얼수업정리.txt" />
+    <Text Include="TextFiles\7월_언리얼수업정리.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class_Month\March\0302~0306.h" />
@@ -81,6 +82,7 @@
     <ClInclude Include="Class_Month\July\0705.h" />
     <ClInclude Include="Class_Month\July\0706.h" />
     <ClInclude Include="Class_Month\July\0707.h" />
+    <ClInclude Include="Class_Month\July\0710.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />
