@@ -65,4 +65,8 @@
 	- UKismetSystemLibrary::Delay(this, 3.0f, LatentInfo);
 
 	FLatentActionInfo는 4개 인자를 받는 생성자랑 인자를 안 받는 생성자 2개를 지원
+
+	16. Collision 채널 관련 변환
+	- UEngineTypes::ConvertToObjectType(ECC_Pawn);
+	- ECC에서 ObjectType으로 변환한건데 ECC -> Channel 혹은 Channel, ObjectType에서 ECC로 변환도 가능
 */
