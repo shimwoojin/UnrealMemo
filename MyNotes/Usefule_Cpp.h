@@ -56,4 +56,13 @@
 	14. if(auto* cont Mesh = Cast<UStaticMeshComponent>(OutActor->GetRootComponent()) {}
 	- if 안 에서 변수 선언 및 대입까지 가능함
 	- C++ 몇 이상 부터 가능해진 것으로 보임
+
+	15. Delay는 UKismetSystemLibrary::Delay(UObject* WorldContextObject, float Duration, FLatentActionInfo LatentInfo);
+	- FLatentActionInfo LatentInfo(int32 inLinkage, int32 UUID, const TCHAR* InFunctionName, UObject* InCallbackTarget);
+	
+	실사용
+	- FLatentActionInfo LatentInfo(0, GetUniqueID(), "FunctionName", this);
+	- UKismetSystemLibrary::Delay(this, 3.0f, LatentInfo);
+
+	FLatentActionInfo는 4개 인자를 받는 생성자랑 인자를 안 받는 생성자 2개를 지원
 */
