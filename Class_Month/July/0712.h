@@ -46,8 +46,8 @@
 
 	12. 간단한 복습으로 BlueprintNativeEvent, BlueprintImplementableEvent는 함수 원형을 virtual로 적으면 안 됨
 	
-	13. 인터페이스의 NativeEvent 구현을 알아보면
-	- _Implementation이 인터페이스의 기본 구현을 가진다면 기본 구현을 하고(PURE_VIRTUAL) 처리를 하여도 됨
+	13. 인터페이스의 BlueprintNativeEvent 구현을 알아보면
+	- _Implementation이 인터페이스의 기본 구현을 가진다면 기본 구현을 하고 아니라면 (PURE_VIRTUAL) 처리를 하여도 됨
 	- 인터페이스를 상속하는 클래스에선 _Implementation을 오버라이드 하면 됨
 	
 	- 함수의 원형은 인터페이스에만 갖고 있으면 됨
@@ -55,7 +55,15 @@
 	14. BlueprintNativeEvent, BlueprintImplementableEvent가 붙은 함수는 call을 할 때 일반 함수들과는 불리는 방식이 다름
 	- IMyInterface::Execute_MyFunction(UObject* O);
 	- 여기서 UObject로 넘겨주어야 하는 객체는 인터페이스를 구현한 클래스여야 함 -> 아닐 경우 check로 걸러 냄
+	- 인터페이스를 블프에서 오버라이드 하려고 하는 경우 C++에서 그 함수를 부를 때
+	Execute_ 가 붙은 static 함수 사용이 강제되는데 그 이유는
+	함수의 원형과 _Implementation이 붙은(BlueprintNativeEvent) 함수는 gen.cpp에서 그 함수를 부를 경우 에러를 내게끔 만들어 놨음
 
 	15. 추가로 라인트레이스시 FHitResult에 담기는 Actor는 약포인터이기 때문에 .Get()을 해야 함
 	- 혹은 Actor를 날포인터로 넘겨줄 수 있는 GetActor()를 HitResult로부터 부를 수도 있음
+
+	16. Blueprint에서 쓰게 끔 만들어 놓은 함수의 경우 (Native, Implementable) 함수 이름에 접두어로 K2_가 붙여서 식별하는 경우가 많은 듯(Kismet 2?? 뭐 이런 뜻이라나)
+	- 블프에서 K2_ 가 붙게 되면 거슬릴 수 있으니 UFUNCTION()의 메타 지정자 중에 meta = (DisplayName = "NoK2Version") 로 블프에 보여질 이름을 바꿀 수도 있음
+
+	17. 16번을 적다보니 생각난 건데 K2_ 버전이 있다면 인터페이스에 K2접두어가 없는 버전을 만들어 K2_가 붙은 버전을 부르는 함수를 만들면 되겠음
 */
