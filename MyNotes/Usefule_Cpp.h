@@ -69,4 +69,16 @@
 	16. Collision 채널 관련 변환
 	- UEngineTypes::ConvertToObjectType(ECC_Pawn);
 	- ECC에서 ObjectType으로 변환한건데 ECC -> Channel 혹은 Channel, ObjectType에서 ECC로 변환도 가능
+
+	17. DynamicDelegate는 C++ 뿐만이 아니라 블프에서도 사용이 가능하게끔 해주는 키워드임
+	- 블프에서 ActorOverlap에 바인딩이 가능한것이 이 키워드를 사용한 델리게이트이며
+	- 이 델리게이트는 UPROEPRTY(BlueprintAssignable)을 사용하여 할당을 가능하게 만들어 준 것
+	- 블프에서 call도 하고 싶다며 UPROPERTY(BlueprintCallable) 을 해주면 됨
+
+	- 위 델리게이트는 AddDynamic인 매크로 함수로 바인드 가능하며
+
+	- 일반 DYNAMIC 키워드가 붙지 않은 델리게이트와 바인드하는 방식이 다름
+
+	- 싱글 캐스트 델리게이트도 DYNAMIC 키워드를 붙일 수는 있으나 블루프린트에서 부를 수 있는 것 같지는 않음
+	- 싱글 캐스트가 DYNAMIC 키워드를 갖게 되면 BINDDYNAMIC으로 바인드 해주어야 함
 */
