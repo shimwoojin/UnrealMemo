@@ -81,4 +81,33 @@
 
 	- 싱글 캐스트 델리게이트도 DYNAMIC 키워드를 붙일 수는 있으나 블루프린트에서 부를 수 있는 것 같지는 않음
 	- 싱글 캐스트가 DYNAMIC 키워드를 갖게 되면 BINDDYNAMIC으로 바인드 해주어야 함
+
+	18. C++ Interface는 언리얼 마법사에서 만들 수 있음
+	- <모든 클래스 표시>가 아닌 기본 제공화면에서
+
+	19. 인터페이스는 리플랙션 제공을 위한 U 접두어로 시작하는 UInterface를 상속받은 인터페이스와
+	실제 함수들을 담는 I 접두어로 시작하는 인터페이스 2개를 작성해야 함(I버전은 상속이 없음)
+	- 리플랙션 관련 키워드들은 U 접두어로 시작하는 UINTERFACE()를 채워주면 되는데
+
+	- BlueprintType : 이 인터페이스를 블루 프린트에서 변수로 사용할 수 있음(멤버변수로 갖고 있을 수 있음)
+	이 키워드가 있어야 NativeEvent나 Implementable도 사용가능한 것 같음
+
+	20. BlueprintNativeEvent, BlueprintImplementableEvent 키워드가 붙은 함수는 C++에서 다른 방식으로 사용
+	- IInterfaceName::Execute_FunctionName(인터페이스를 구현한 주체);
+
+	- 인터페이스를 블루 프린트와 연동하기가 굉장히 힘들어 보임 ㅋㅋ
+	몇 가지 포인트가 있는데
+	
+	- 인터페이스로 cast를 하고 나서 -> 로 FunctionName(); 을 부르게 되면 assert 걸림 (gen.cpp에 적혀있음)
+	- gen.cpp 기준으로 native는 블프가 구현 안 되어 있으면 _Implementation을 부르고 아니라면 블프 구현을 부름
+	- 위와 마찬가지로 ImplementationEvent는 블프 구현이 있어야만 블프 구현 내용을 부름
+
+	- 추가로 Native, Implementation이 있다면 -->> IInterfaceName::Execute_FunctionName(인터페이스를 구현한 주체);
+	로만 C++에서 함수를 부를 수 있으며 <인터페이스를 구현한 주체> 부분이 인터페이스를 상속받은 객체가 아닐 경우 assert(check)에
+	걸리게 됨
+	- 블루 프린트처럼 인터페이스를 상속받지 않은 대상에게 함수를 call해도 아무일도 일어나지 않는 것이 아니라 crash 나기 때문에
+	1) cast를 하거나
+	2) bool bIsImplemented = OriginalObject->GetClass()->ImplementsInterface(UReactToTriggerInterface::StaticClass()); 
+
+	U접두어가 붙은 인터페이스의 StaticClass를 얻어와서 위 검사를 해주고 인터페이스를 call 해주어야 함
 */
