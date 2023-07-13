@@ -332,3 +332,172 @@
 	- 가비지 컬렉터를 강제 동작시키는 명령어도 있었던 걸로 기억하는데 뭐였더라
 
 	8. 공식 문서에서 MulticastDelegate 사용에 있어 매개변수로 래퍼런스를 넘겨 초기화를 하고자 하는 사용법은 bad라고 함
+
+====
+0711
+====
+	1. TArray를 채우는 방법은 여러가지
+	- AddDefaulted
+	- Init
+	- Emplace(생성 즉시 배열에 대입)
+	- Add(생성 후 복사로 배열에 대입)
+
+	- 문서 왈 : empalce가 add보다 성능이 떨어질리 없지만 가독성 면에서 add가 나을 것이니 가벼운 건 add, 그 외엔 emplace 사용
+
+	2. 뜬금 질문으로 생성자에 : Super()가 안 붙는 이유는 인자가 없는 생성자는 명시적으로 안 써도 됨
+	- 부모의 인자가 있는 생성자를 사용하고 싶은 경우엔 : (이니셜라이저)를 사용하여 초기화
+	- 이니셜라이저(:)를 사용하여 TArray같은 멤버변수도 초기화 할 수 있음
+	ex. TArray<int> MyInt;가 있다면 MyClass() : MyInt(10, 3) {} 처럼 -> MyInt(10,3)은 TArray의 생성자를 활용한 것 -> 크기는 3만큼 각 원소는 10으로 초기화
+
+	3. 라인 트레이스(Objects, Profile, Channel)
+	- #include "Kismet/KismetSystemLibrary.h"
+	- UKismetSystemLibrary::LineTraceSingleByObjects();
+
+	- 라인 트레이스 시(함수이름 끝이 Objects인 것) 어떤 Object와 충돌인지 검사하기 위해 ObjectTypeQuery인가 열거형을 넘겼어야 하는데
+	ECollisionChannel과 ObjectType 간에 변환을 해주는 Convert 함수가 있음(UEngineTypes의 static 함수)
+
+	- ECC_Pawn의 경우 ObjectTypeQuery3과 매칭됨
+	- ECC와 Object, Chanel간의 채널에 대해선 3,4일 전 정리에서 설명한 적 있음(사용자 설정 object, channel 관련해서도 적혀 있음)
+
+	4. Kismet에 있는 라인 트레이스는 사용을 간편화 해주는 래핑 함수
+	- 무슨 말이냐 ? : GetWorld()->LineTraceSingleByObjects(); 로도 라인 트레이스를 할 수 있으나 넘겨야 하는 인자가 까다롭기 때문에 이것을 간편화해주는 함수인 것임
+
+	5. LineTrace 시 hit한 actor가 character로 cast가 성공하면 LaunchCharacter를 하게 되는데
+	- LaunchCharcter는 Character.h의 함수이고
+	- 내부적으론 캐릭터의 MovementComponent를 찾아 MovementComponent::Launch()를 콜해서 동작하는 방식이며
+	- BlueprintImplementable 함수인 OnLaunched()를 부르며 마무리 함 -> OnLaunched를 블프에서 오버라이드하면 launch를 call 했을 때 callback되는 일종의 델리게이트같은 작동인 듯
+
+	6. CreateDefaultSubobject를 배열 버전으로 만든 매크로 사용 시 좌측 값으로 배열의 인덱스에 값을 대입하는 방식이기 때문에
+	- TArray를 사용함에 있어 배열의 크기를 먼저 잡아놓지 않는 이상 오류가 날 수 있음 -> 매크로라 알아채기도 힘들 수도
+
+	7. 6번이 좌측에 배열의 인덱스를 먼저 잡아놓은 매크로여서 오류가 난건데
+	- 좌측을 뗀 버전을 먼저 만들고
+	- 좌측 값도 넣은 버전을 만들 땐 좌측을 뗀 버전과 합쳐서 매크로를 만든다면 나름 깔끔한 코딩이라고 할 수 있겠음
+
+====
+0712
+====
+	1. TArray의 생성자 중 복사로 넘어가는 값에는 nullptr을 넘기면 안 됨 -> 다른 생성자 찾아야 함
+
+	2. 오랜만에 나온 초기화 방법 3가지, copy, direct, uniform
+	- copy : =
+	- direct : ()
+	- uniform : {}
+
+	- uniform은 셋 중 제일 엄격하며 엄격하기 때문에 추천하는 초기화 방식
+	- double d{3.4f}; 같은 초기화는 경고가 아닌 에러를 냄
+
+	3. 인터페이스 생성은 언리얼 마법사로 가능함
+	- <모든 클래스 표시>가 아닌 곳에서
+	
+	4. C++ 인터페이스는 UInterface를 상속받은 U 접두어가 붙은 클래스와
+	아무 상속도 받지 않은 접두어가 I인 클래스 2개를 작성하게 됨
+	- UINTERFACE()로 리플랙션에 노출은 U접두어 클래스가 해주고
+	- 우리가 작성할 함수들은 I 접두어가 붙은 클래스에 적게 됨
+
+	5. 블프의 인터페이스 = 순수 가상 함수 <-> C++의 인터페이스는 가상 함수도 가능하며 static도 가능
+
+	6. I접두어 인터페이스에서 C++ 키워드인 abstract가 가능한데 그 이유는 리플랙션에 적용받지 않고 엔진에서 인스턴스를 안 만들기 때문에 가능함
+	- abstract 사용엔 주의할 점이 있는데 I 인터페이스를 상속한 클래스에서 바로 abstract 키워드가 붙은 함수를 구현해주어야 함(클래스를 하나 건너뛰고 구현하면 에러)
+	- 아니라면 상속받은 클래스가 abstract 키워드를 사용하게 되는데 리플랙션에 노출된 클래스라면 엔진이 인스턴스 1개 이상을 강제하기 때문에 이 과정에서 에러가 남
+
+	7. 언리얼의 인터페이스 사용은 다중 상속으로
+	- , public IMyInterface
+
+	8. #include의 경우 선언 위치가 파일의 맨 위여야만 하는 것은 아님
+	- 헤더가 필요한 곳에서 include해서 쓰는 것이 나은 경우가 있을 수 있음
+	- 클래스 사이에 #include 적어서 쓰는 기법도 많은 듯
+
+	9. 인터페이스의 기본 사용은 인터페이스의 헤더를 추가 후 인터페이스로 Cast하여 사용하면 됨
+	- Cast의 유효 체크 후 사용하면 안전한 사용이 되겠음
+
+	10. 가벼운 인터페이스 헤더를 추가함으로서 컴파일 타임을 줄이는 것만으로도 장점이라고 볼 수 있겠음
+	- 언리얼 헤더들이 워낙에 무겁다 보니
+
+	11. 인터페이스를 원래 인터페이스의 정의에 맞게끔 순수가상으로만 구성하고 싶다면
+	- 1) abstract : C++ 문법이며 IInterface가 리플랙션에 노출되지 않아 가능, 하지만 상속받은 클래스들이 한 다리 건너뛰고 구현하면 에러
+	- 2) PURE_VIRTUAL(FUNCTION_NAME) : 함수 구현부를 가지는 매크로이며 구현부가 실제 코드상에서 불리게 되면 LowLevelFatalError를 일으켜서 이 함수는 오버라이드가 강제됨
+	- 3) unimplemented() : check(assert)를 포장한 매크로, check는 크래쉬를 일으켜 엔진을 중지시키는 언리얼의 assert 구문
+	
+	- PURE_VIRTUAL을 추천하는 이유는 어떤 함수에서 크래쉬가 난지 알려주는 관점에서 좋을 것 같음
+
+	12. 간단한 복습으로 BlueprintNativeEvent, BlueprintImplementableEvent는 함수 원형을 virtual로 적으면 안 됨
+	
+	13. 인터페이스의 BlueprintNativeEvent 구현을 알아보면
+	- _Implementation이 인터페이스의 기본 구현을 가진다면 기본 구현을 하고 아니라면 (PURE_VIRTUAL) 처리를 하여도 됨
+	- 인터페이스를 상속하는 클래스에선 _Implementation을 오버라이드 하면 됨
+	
+	- 함수의 원형은 인터페이스에만 갖고 있으면 됨
+
+	14. BlueprintNativeEvent, BlueprintImplementableEvent가 붙은 함수는 call을 할 때 일반 함수들과는 불리는 방식이 다름
+	- IMyInterface::Execute_MyFunction(UObject* O);
+	- 여기서 UObject로 넘겨주어야 하는 객체는 인터페이스를 구현한 클래스여야 함 -> 아닐 경우 check로 걸러 냄
+	- 인터페이스를 블프에서 오버라이드 하려고 하는 경우 C++에서 그 함수를 부를 때
+	Execute_ 가 붙은 static 함수 사용이 강제되는데 그 이유는
+	함수의 원형과 _Implementation이 붙은(BlueprintNativeEvent) 함수는 gen.cpp에서 그 함수를 부를 경우 에러를 내게끔 만들어 놨음
+
+	15. 추가로 라인트레이스시 FHitResult에 담기는 Actor는 약포인터이기 때문에 .Get()을 해야 함
+	- 혹은 Actor를 날포인터로 넘겨줄 수 있는 GetActor()를 HitResult로부터 부를 수도 있음
+
+	16. Blueprint에서 쓰게 끔 만들어 놓은 함수의 경우 (Native, Implementable) 함수 이름에 접두어로 K2_가 붙여서 식별하는 경우가 많은 듯(Kismet 2?? 뭐 이런 뜻이라나)
+	- 블프에서 K2_ 가 붙게 되면 거슬릴 수 있으니 UFUNCTION()의 메타 지정자 중에 meta = (DisplayName = "NoK2Version") 로 블프에 보여질 이름을 바꿀 수도 있음
+
+	17. 16번을 적다보니 생각난 건데 K2_ 버전이 있다면 인터페이스에 K2접두어가 없는 버전을 만들어 K2_가 붙은 버전을 부르는 함수를 만들면 되겠음
+
+====
+0713
+====
+	1. C++의 MyInterface를 블프의 BP_Explosion에 상속 후 (C++의 인터페이스를 블프에 직접 상속)
+	- C++ 코드로 (Execute_) 실행시켜보려 했을 때 블프에서 그 함수를 오버라이드 하지 않았음에도 "블프에 함수 구현이 있는 걸 부르겠다" 라는 흐름으로 빠짐(gen.cpp)
+	- 이 테스트 과정에서 UINTERFACE() 였던 것이 0순위로 의심됨(지정자를 채우거나) or native의 동작이 원래 그렇거나
+
+	2. 솔루션 탐색기의 '검색'창 활용
+	- '몽타주 재생' 노드의 정체를 밝히기 위해 '검색'창에 playmontagecallbackproxy 검색
+
+	3. UPlayMontageCallbackProxy를 까보면
+	- private으로 감추고 static 으로 선언한 PlayMontage 노드가 있음
+	- 몽타주는 같은 몽타주여도 ID가 다름
+	
+	4. '몽타주 재생'의 출력 핀이 여러개일 수 있는 원리는 간단하게 말하면 'DynamicMulticastDelegate'임
+	- AnimInstance가 갖고 있는 BlendOut, Interrupted, ... 등의 델리게이트에서 Proxy의 델리게이트를 호출하고
+	- 우리가 연결해 놓은 핀들은 Proxy의 델리게이트에 바인드를 하게 되는 것
+
+	- 위 과정을 거치면 우리의 애님 인스턴스가 몽타주마다 BlendOut, Interrupted,... 등의 상황에서 타이밍에 맞게(얘네도 델리게이트를 호출하는 것) Proxy의 델리게이트를 호출하는 함수를 호출하는데
+	이 때 바인드되어 있는 것이 있다면 불리게 되는 것(Broadcast)
+
+	- '몽타주 재생' 자체가 Proxy임 -> 이 노드가 불리는 만큼 Proxy가 만들어지게 된다고 보면 됨
+	- 걸어놨던 내용은 '몽타주 재생' = Proxy 가 Destroy 되는 시점에 모두 Unbind 하게 됨
+
+	5. Proxy : 중개자 정도의 의미로 받아들이면 됨
+
+	6. 각각의 출력 핀(흐름)들은 UPROPERTY(BlueprintAssingable)로 걸려있어 우리가 거는 흐름은 다이내믹 멀티캐스트 델리게이트에 '할당' 하게 되는 것과 마찬가지
+	- UPROPERTY(BlueprintAssingable) : dynmulticastdelegate를 블프에서 '할당'할 수 있게 만드는 키워드임
+	- 이게 핀으로서 출력될 수 있었던 이유는 UObject - UEdNode - K2Node - ,... - K2Node_PlayMontage 로 상속받은 구조 자체로 엔진에서 처리를 해주는 듯
+	- 위에서 설명한 Proxy도 K2Node_PlayMontage가 참조하는 형태로 가지고 있고 실질적으로 K2Node_PlayMontage가 Proxy를 만들어서 처리하는 듯
+
+	7. Proxy를 만들어서 부르는 '몽타주 재생' 이건 Character의 함수인 PlayAnimMontage이건 결국엔
+	- AnimInstance의 MontagePlay를 내부에서 부르고 있음
+	- 결국 AminInstance의 MontagePlay가 끝판왕임 -> 얘 부르면 됨
+
+	8. uasset의 경우 Content 이후의 경로만 망가뜨리지 않는다면 '이주'가 아닌 폴더에서 복사나 이동으로 넘겨줘도 됨
+
+	9. 에디터 유틸리티 - 에디터 유틸리티 블루프린트가 있음
+	- 에디터에 기능을 더 추가해줄 수 있는 듯
+
+	10. 애니메이션을 다룸에 있어 블프가 아쉬운 점은
+	- MetaData를 다룰 수 없음
+
+	- 애니메이션 에디터에서 배열로 추가해 줄 수 있고
+	- MetaData 클래스를 만들어서 그 클래스를 위 배열에 추가해 줄 수 있음
+	- 하지만 CPP에서나 처리해 볼 수 있는 듯
+
+	- 애니메이션의 MetaData를 유용하게 쓸 수 있는 경우는 '공격 애니메이션' 자체가 공격 계수를 가지고 있어 원래 공격력에 배수로 데미지가 들어간다던가
+	하는 애니메이션 단위로 처리가 가능함(다른 유용한 활용이 많을 듯)
+
+	- 유틸리티 블루프린트에서는 'GetMetaData'를 가지고 올 수 있긴 함(인 게임내 적용 받을 내용이 아니라 애니메이션의 관리를 위해 여기에만 풀어놓은 것 같기도)
+
+	11. 애니메이션 에디터에서 '커브'를 시간 별로 편집하게 되면
+	- 애니메이션 블루프린트에서 'Get Curve Value'로 현재 애니메이션의 시점에서의 커브 값(float)이 얼마인지를 알 수 있음
+	
+	- 게임에 적용시키기 좋은 예는 공격 타이밍에 따라 데미지가 다르게 들어갈 수 있게끔 처리할 수도 있을 듯
+

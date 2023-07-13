@@ -171,6 +171,7 @@
     <ClInclude Include="Class_Month\July\0710.h" />
     <ClInclude Include="Class_Month\July\0711.h" />
     <ClInclude Include="Class_Month\July\0712.h" />
+    <ClInclude Include="Class_Month\July\0713.h" />
     <ClInclude Include="Class_Month\June\0619.h" />
     <ClInclude Include="Class_Month\June\0620.h" />
     <ClInclude Include="Class_Month\June\0621.h" />
