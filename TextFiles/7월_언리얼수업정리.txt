@@ -455,7 +455,8 @@
 	- '몽타주 재생' 노드의 정체를 밝히기 위해 '검색'창에 playmontagecallbackproxy 검색
 
 	3. UPlayMontageCallbackProxy를 까보면
-	- private으로 감추고 static 으로 선언한 PlayMontage 노드가 있음
+	- private으로 감추고 static 으로 선언한 'CreateProxy 어쩌구 저쩌구' 함수가 있음
+	- 예를 부르게 되면 private으로 감춰둔 PlayMontage를 부르게 됨
 	- 몽타주는 같은 몽타주여도 ID가 다름
 	
 	4. '몽타주 재생'의 출력 핀이 여러개일 수 있는 원리는 간단하게 말하면 'DynamicMulticastDelegate'임
