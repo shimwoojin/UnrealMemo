@@ -110,4 +110,8 @@
 	2) bool bIsImplemented = OriginalObject->GetClass()->ImplementsInterface(UReactToTriggerInterface::StaticClass()); 
 
 	U접두어가 붙은 인터페이스의 StaticClass를 얻어와서 위 검사를 해주고 인터페이스를 call 해주어야 함
+
+	21. 사운드를 다룸에 있어 1) 사운드 큐 2) 사운드 웨이브(wav)가 있는데
+	- 사운드 웨이브로 사운드 큐를 구성한다고 함(사운드 큐가 최종 결과물)
+	- 사운드 큐 에디터에선 최종 소리가 얼마나 될지나 소리를 합치는 등의 작업을 할 수 있는 듯
 */

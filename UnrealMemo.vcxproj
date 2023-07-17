@@ -228,6 +228,9 @@
   <ItemGroup>
     <Image Include="Images\ZoomInOut.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MyNotes\Useful_Animation.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
