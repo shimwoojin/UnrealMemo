@@ -11,7 +11,18 @@
 	- enum은 수치를 보기 좋게 포장한 느낌 / enum class는 <고르시오> 같은 느낌
 
 	4. 리플랙션에 노출되지 않은 코드를 리플랙션에 노출된 코드에서 사용할 경우 에러날 수 있음
-	- typedef 
+	
+	typedef int MyInt;
+
+	USTRUCT()
+	struct MyStruct
+	{
+		GENERATED_BODY()
+
+		MyInt i;
+	}
+	
+	- 리플랙션 코드에서 typedef이 적히지 않아 MyInt의 타입을 알 수 없게 됨
 
 	5. 구조체를 데이터 테이블로 활용하기 위해선 : public FTableRowBase 를 상속
 	- #include "Engine/DataTable.h"
