@@ -4,7 +4,6 @@
 
 	2. enum 복습
 	- enum class에 지정자 BlueprintType이 붙게 되면 : uint8 이 강제 됨 -> 저 키워드 없이 UENUM()만 한다면 타입 상관 없음
-	- namespace로 감싼 enum은 : uint8 같은 문법 불가능 -> enum class만 가능한 듯
 	- namespace로 감싼 enum이 TEnumAsByte<>로 강제되는 경우가 있는데 그 경우는 Member Variable인 경우
 
 	3. <namespace로 감싼 enum> vs <enum class>
