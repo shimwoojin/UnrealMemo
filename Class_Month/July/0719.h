@@ -36,7 +36,7 @@
 	- 우리가 new를 오버로딩을 하게 되면 원래의 기능 중에 클래스의 생성자를 불러준다거나 하는 기능은 안 잃는다는 관점에서 -> 를 오버로딩하는 것과 비슷하다고 함
 
 	6. UStaticMeshComponent::GetLocalBounds(FVector& Min, FVector& Max);
-	- 스태틱 메쉬를 직육면체로 가뒀다고 가정했을 때 모서리 점을 담아올 수 있는 함수 -> 매개변수를 작성 시 const가 붙지 않으으로서 수정 반환 할 것임을 알 수 있었음
+	- 스태틱 메쉬를 직육면체로 가뒀다고 가정했을 때 모서리 점을 담아올 수 있는 함수 -> 매개변수를 작성 시 const가 붙지 않음으로서 수정 반환 할 것임을 알 수 있었음
 
 	7. AActor::GetActorScale()과 AActor::GetActorScale3D()는 내부 구현이 같음
 	- 삼항 연산자 vs if문 으로 내부 구성이 다를 뿐이지 return 값 자체는 같음
