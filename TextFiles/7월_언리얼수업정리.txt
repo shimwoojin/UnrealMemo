@@ -504,3 +504,426 @@
 	
 	- 게임에 적용시키기 좋은 예는 공격 타이밍에 따라 데미지가 다르게 들어갈 수 있게끔 처리할 수도 있을 듯
 
+====
+0718
+====
+	1. class UParkourComponent : public UActorComponent {} 생성
+
+	2. enum 복습
+	- enum class에 지정자 BlueprintType이 붙게 되면 : uint8 이 강제 됨 -> 저 키워드 없이 UENUM()만 한다면 타입 상관 없음
+	- namespace로 감싼 enum이 TEnumAsByte<>로 강제되는 경우가 있는데 그 경우는 Member Variable인 경우
+
+	3. <namespace로 감싼 enum> vs <enum class>
+	- 취향 차이 혹은 사용처가 갈린다라고 할 수 있음 -> enum class의 경우 정수형으로 auto cast가 안 되기 때문에 이런 상황
+	- enum은 수치를 보기 좋게 포장한 느낌 / enum class는 <고르시오> 같은 느낌
+
+	4. 리플랙션에 노출되지 않은 코드를 리플랙션에 노출된 코드에서 사용할 경우 에러날 수 있음
+	
+	typedef int MyInt;
+
+	USTRUCT()
+	struct MyStruct
+	{
+		GENERATED_BODY()
+
+		MyInt i;
+	}
+	
+	- 리플랙션 코드에서 typedef이 적히지 않아 MyInt의 타입을 알 수 없게 됨
+
+	5. 구조체를 데이터 테이블로 활용하기 위해선 : public FTableRowBase 를 상속
+	- #include "Engine/DataTable.h"
+	- 상속이기 때문에 부모의 헤더 필요
+	- 실제 데이터 테이블을 물려 주기 위해선 class UDataTable* DataTable; 에 담아줘야 함
+
+	6. 데이터 테이블값 TArray에 얻어오기
+	- TArray<FParkourData const*> Rows;
+	DataTable->GetAllRows("", Rows)
+	- Rows에 데이터 테이블의 값을 인자로 넘겨 받아오는 건데
+	 ""를 넘기는 건 모든 rows를 얻어오겠다는 뜻 -> "" 안에 이름에 포함된 문자열이 있다면 그 녀석들만 얻어오게 됨
+
+	 7. static 멤버 변수는 UPROEPRTY 키워드 쓰면 안 됨(static을 타입명으로 읽어서 컴파일 시 오류)
+	 - 우회하는 방법은 static 멤버변수를 반환하는 Getter를 블프에 노출해주면 됨
+
+	 8. 마찬가지로 다중 컨테이너(map에서 value로 배열을 가지는 등)가 블프에선 사용이 안되지만
+	 - 우회 : 구조체에 배열 멤버를 가지고 그 구조체를 value로 가지는 map 정의 -> 실사용은 하지 말자
+
+====
+0719
+====
+	1. 캐릭터 기준 배꼽, 왼손, 오른손, 발, 머리 쪽에 애로우 컴포넌트 달아줌
+	- 장애물에 대한 조사를 위해서 달아준 보조 컴포넌트임(위치와 방향 제공)
+	- 모든 애로우에서 라인 트레이스를 해서 장애물을 감지해 볼 수도 있지만 쓸데없는 계산은 줄이기 위해 배꼽 쪽 라인트레이스가 감지되면 추가로 감지되는 방식으로 구성할 예정
+
+	2. SceneComponent::GetForwardVector()로 트랜스폼을 가지는 컴포넌트들은 정면벡터를 얻어올 수 있음
+	- 하지만 Rotation에서 정면 벡터를 뽑아오고 싶은 경우 쿼터니언으로 변환 후 정면벡터를 뽑아올 수 있음
+
+	3. TMap<>의 경우 key값이 없는 상태에서 = 연산자로 value값을 넣으려고 한다면 오류남(구현 된 내용이 없는 듯)
+	- 헷갈릴 수 있는 부분은 C++ 문법은 위와 같은 내용을 지원함
+
+	ex. std::map<char, int> MyMap;
+	MyMap['c'] = 1;
+
+	같은 문법이 원래는 가능하다는 것임 -> TMap<>은 안 됨(엔진 튜닝 ㄱ ?)
+
+	- TMap::Add(AnyType key) 오버로딩 버전 중에 key만 넘겨서 기본 값 잡을 수도 있긴 함, 위 안되는 내용을 보완할려고 만들었나,,
+	- = 연산자로 할당하고 싶으면 Add의 key만 받는 버전으로 기본 값 잡아놓고 해주면 됨
+
+	4. 지역 내에서 typedef을 사용하여 그 지역 내에서만 타입에 별명 지어서 사용 가능
+	- typedef UStaticMeshComponent MeshType;
+	- 어느 경우에 유용하냐면 1) 위처럼 변수 이름이 길다거나 2) int32 -> int64처럼 바뀔 수도 있는 경우나 3) 타입 자체가 별명을 가져 표현하고 싶은 경우
+
+	- 지역을 벗어나면 typedef은 없던 일로 됨(흔히 알고 있던 지역의 개념이 먹힌다고 보면 될 듯)
+
+	- 추가로 using MeshType = UStaticMeshComponent; 처럼 같은 표현을 할 수도 있지만 언리얼은 위 문법이 작동안하는 경우가 있다고 함
+
+	5. TWeakObjectPtr의 -> 는 오버로딩 되어 있음
+	- 무슨 말이냐 하면 weak pointer는 Cpp에서 사용하기 전에 .get()을 하여야 사용할 수 있었는데
+	- -> 를 오버로딩함으로서 return ~~.Get()을 해주게 되는데
+	- ->와 같은 연산자들은 오버로딩 시 원래의 기능을 잃지 않음(구조체나 클래스 포인터의 멤버에 접근하는 기능 자체는 오버로딩을 해도 사라지지 않는다는 뜻)
+	- 구조체나 클래스의 멤버에 접근하는 연산자 . 는 오버로딩하면 기능을 잃는 건지 오버로딩이 안 되는 건지 ->랑 다르다고 함
+
+	- 추가로 new 도 오버로딩이 가능한데 new는 메모리 상 공간을 잡아주고 클래스의 생성자를 불러주는 역할까지 여러가지를 하게 되는데
+	- 우리가 new를 오버로딩을 하게 되면 원래의 기능 중에 클래스의 생성자를 불러준다거나 하는 기능은 안 잃는다는 관점에서 -> 를 오버로딩하는 것과 비슷하다고 함
+
+	6. UStaticMeshComponent::GetLocalBounds(FVector& Min, FVector& Max);
+	- 스태틱 메쉬를 직육면체로 가뒀다고 가정했을 때 모서리 점을 담아올 수 있는 함수 -> 매개변수를 작성 시 const가 붙지 않음으로서 수정 반환 할 것임을 알 수 있었음
+
+	7. AActor::GetActorScale()과 AActor::GetActorScale3D()는 내부 구현이 같음
+	- 삼항 연산자 vs if문 으로 내부 구성이 다를 뿐이지 return 값 자체는 같음
+
+	8. UKismetMathLibrary::MakeRotFromX(-Result.Normal).Yaw;
+	- 라인 트레이스로 얻은 메쉬 표면에 수직인 (메쉬로 향하는 방향의 수직) 방향을 yaw로서 float값(-180 ~ 180)으로 받게 됨
+
+====
+0720
+====
+	1. float YawToFace;
+	- 파쿠르 시 우리가 진행할 방향의 yaw 값
+
+	2. 배꼽에서 나오는 트레이스가 히트에 성공하면 왼손, 오른손, 발, 머리에서도 트레이스를 쏘는데
+	파루크를 성공하려면 왼손, 오른손의 트레이스가 성공해야 하고 왼손, 오른손 트레이스 결과의 Normal이 배꼽 트레이스 결과의 Normal과 둘 다 같아야 함
+	- 왼손, 오른손도 잡을 공간이 있어야 한다는 뜻
+
+	3. void BeginParkour();
+	- EParkourType::None이면 return;
+	- 아닐 경우 파쿠르 타입에 맞는 파쿠르 진행할 듯
+
+	4. FVector의 dot과 cross
+	- dot : |
+	- cross : ^
+
+	- 연산자 오버로딩 되어 있는 내용
+
+	- 가독성이 안 좋으니 FMath::DotProduct(FVector, FVector); 같은 함수로 처리하자
+
+	5. FVector의 ==과 Equal(FVector)의 차이
+	- == : 벡터의 성분들이 float임에도 불구하고 x,y,z에 대해 각각 == 비교를 함 -> 0.000001이라도 오차가 날 경우 다른게 됨
+	- Equal : 오차 허용 있음 -> KINDA_SMALL_NUMBER인가 암튼 비슷한 이름인데 10e-4인가 그랬음, 0.0001정도
+
+	6. FMath::Cos()은 cosf()을 래핑한 함수
+	- 언리얼이 외부 라이브러리에 대해 래핑을 다 해서 '외부 라이브러리 쓰지 말고 우리꺼 써라'라는 협박과 동시에 일관성을 지킨 경우
+
+	7. cos, sin 다룰 땐 degree, radian 항상 생각
+	- FMath::DegreesToRadians();
+
+	8. auto는 더 넓은 범위로 잡힘
+	- int() + float() 일 경우 float
+	- float() + double() 일 경우 double
+
+	9. 후행 반환
+	
+	template<class T>
+	static auto FMath::DegreesToRadians(const T& DegVal) -> decltype((Degval * (PI / 180.0f))
+	{
+		//...
+	}
+
+	- Degval이 int일 경우에도 float이 반환 값이 됨
+	- template<class T> static auto 대신 template<class T> static decltype((Degval * PI / 180.0f)) 처럼 쓸 수는 없으니 후행 반환을 사용하는 것
+
+	- 추가로 템플릿은 컴파일 타임에 함수를 만들고 시작하기 때문에 위 auto의 경우 컴파일 타임에 이미 decltype에 대한 type이 이미 추론 됨
+
+	10. 메쉬가 울퉁불퉁해 보이는 경우는 있지만 실제 울퉁불퉁하진 않은 경우가 많음
+
+	11. Vector의 dot은 정규화 된 값을 다루고 있는지 한 번 더 생각
+
+====
+0721
+====
+	1. FMath::IsNearlyEqaul()
+	- 오차 허용 범위 지정 가능
+
+	2. 헷갈렸던 for문
+
+	 for(int32 i = 0; i < 5 && Data == nullptr; i++
+	 {
+		Data = FindData(i);
+	 }
+
+	- (i < 5)이고 (Data == nullptr)이 둘 다 true여야 for문이 진행 됨
+
+	3. 파쿠르 순서
+	- 장애물 확인 -> 머리 쪽에 장애물 있고 파쿠르 가능하면 climb -> 아니라면 아래 쪽에 장애물 없고 파쿠르 가능하면 slide -> 아니라면 일반 파쿠르
+
+====
+0724
+====
+	1. 함수 타입에 auto가 읽히려면 갖다쓰려는 곳보다 먼저 적혀야 함
+	
+	2. 지역 변수는 선언과 동시에 초기화해야 오류 안남
+
+	3. if문 안에서 초기화는 =과 ==이 헷갈릴 수 있어서 막아놓은 듯
+	- 선언과 동시에 초기화하는 것은 가능하나 선언 후 따로 초기화를 막아놓은 듯
+
+	4. UInputComponent::BinxAction() 사용 중에 EInputEvent::IE_Pressed 같은 인자를 받는 것이 있음
+	- 눌렀을 때나 뗐을 떄 등 어떤 키 입력인지를 정하는 열거자
+
+	5. actor는 component들의 중개자
+	- 외부에서 어떤 기능에 대해 처리할 때 component들을 직접 가져다가 처리하기 보단 component들을 활용하여 구성된 actor의 함수를 구성하여 처리하는 것이 옳은 방법
+
+	- 우리 Character의 void Parkour() 함수가 ParkourComponent의 void BeginParkour()를 대신 불러주는 것과 같은 설계가 위와 같음
+
+	6. 애니메이션에 root motion이 걸려있을 때 애님 블프에 몽타주에 대한 슬롯 설정이 없었어도 그 애니메이션이 재생된다면 root motion에 대한 움직임은 발생했어야 함
+
+	7. 디버그 시 bool 지역변수가 최적화 변수라서 값 확인이 불가능한 경우가 있었음
+	- 우리 VS 빌드 모드가 <development editor>였기 때문일까
+	- <debug editor>였다면 bool 지역변수도 값을 찍어줬을 것임
+
+	- development editor가 어느 정도의 최적화와 디버그를 겸한 모드로 알고 있음
+	- development vs development editor의 차이는 .exe를 만드느냐와 dll을 만드느냐의 차이
+
+	- .exe를 만들어도 사용할 수 없음 -> 실행에 필요한 다른 파일들이 그 경로에 준비되어 있지 않음
+
+	8. 파쿠르 로직 중 크게 2가지 정도 문제가 있음
+	- 1) dot에 대해 모서리의 normal과 처리할 시 문제
+	- 2) 물체의 extent.z에 대해서만 처리를 했는데 z가 충족해야 파쿠르를 하는 물체도 있지만 x 혹은 y가 충족해야 하는 물체도 있음
+
+	9. 위 2번에 대한 문제는 우리가 처리할 obastcle의 extent를 float이 아닌 FVector로 받아 0이 아닌 각 요소에 대해서 처리하는 방식으로 로직 구성할 예정
+
+	10. 데이터 테이블 .csv 연동
+	- .csv 파일의 경로 설정 후 리임포트
+
+	11. float& FVector::Component(int32 Index)
+	- index로 FVector의 x,y,z에 접근할 수 있는 함수
+	- return (&X)[Index); 와 같은 로직인데
+	- 벡터의 X 주소를 뽑아서 index로 포인터 연산으로 다시 접근하는 것
+
+====
+0725
+====
+	1. 파쿠르를 하기 위해 obstacle의 z가 중요한 경우가 있고 x 혹은 y가 중요한 경우가 있음
+	- FVector를 포함한 구조체를 만들어서
+	- 그 값이 0이 아닐 경우 obstacle의 성분과 검사를 진행
+
+	2. 파쿠르 진행을 큰 그림으로 보고 가면
+	- 1) 키 입력을 통해 Character의 Parkour()를 호출함 -> Parkour()는 ParkourComp의 BeginParkour()를 호출하는 함수
+	- 2) BeginParkour()는 파쿠르가 가능한 상황인지를 검사하는데
+	- 3) 배꼽, 왼손, 오른손 즈음에서 나오는 LineTrace에 Obstacle이 모두 닿아야 하고
+	- 4) 그 모든 LineTrace들이 AcceptableAngle(45도) 보다 작은 각도여야 하고
+	- 5) 위 조건을 통과하고 나면 climb을 할지 slide를 할지 일반 높이의 파쿠르를 할지를 정하기 위해 머리, 발 쪽의 LineTrace를 검사하여
+	- 6) 머리 쪽 트레이스가 obstacle과 충돌이 있다면 데이터 테이블에서 설정한 파쿠르 모션을 실행하는데
+	- 7) 파쿠르 모션이 캐릭터가 Obstacle과 유효한 거리에 있는지 DistMin, DistMax를 검사하고(데이터 테이블의 값과 라인트레이스의 결과를 대조하는 것)
+	- 8) 데이터 테이블이 가지고 있는 정보 중 obstacle이 580 +- 10 의 오차 범위 안 쪽에 있어야만 climb하는 파쿠르를 할 수 있음
+	- 9) 마찬가지로 slide는 climb은 아니지만 아래 쪽 LineTrace가 충돌이 없고
+	- 10) DistMin, DistMax를 충족하며 Obstacle과 바닥과의 거리가 충분한지를 검사하여 slide를 실행함
+	- 11) Climb, Slide가 아니면 일반 파쿠르 검사를 진행하고 마찬가지로 DistMin, DistMax, Obstacle의 x,y,z 중 일치하는가를 검사하여 파쿠르 진행
+
+	- 움직임 자체를 만들어진 애니메이션만큼 움직이게 하고자 Root Motion을 사용한 몽타주를 재생하게 되는데
+
+	- Climb의 경우 캐릭터의 z값이 변화하는 것이기 때문에 CharacterMovemonetComponent에서 Mode를 Fly모드로 바꿔주어야 하고(Walk Mode의 경우 Z값이 변하는 RootMotion 애니메이션 사용해봐야 제자리에서 동작함)
+	- 일반 파쿠르의 경우 Root 본은 바닥에 붙어 질질 끌려오는 애니메이션이기 때문에 캡슐과 Obstacle간의 충돌이 일어나지 않게끔 하여 진행하게 됨
+	- Slide의 경우도 마찬가지로 캐릭터의 Capsule과 장애물의 충돌이 안 일어나는 방식을 사용해야 할 것임
+
+	3. 같은 일반 파쿠르여도 진입 거리에 따라 다른 모션이 나오게끔 만들어놨는데
+	- LineTrace 거리가 500이고
+	- 진입 거리에 따라 0 - 80 , 80 - 160, 160 - 240, 240 - 320 같은 느낌으로 분할을 하여 파쿠르를 가능하게 끔 해놨음
+	- 무슨 뜻이냐면 Obstacle과 캐릭터와의 거리가 500보다 가까우면 파쿠르의 일정 조건을 만족한 것이고
+	- 320보다도 가까우면 특정 파쿠르에 몽타주의 조건을 만족하게 된 것
+
+	4. Root Motion이 적용된 애니메이션을 활용하려면 캐릭터의 콜리전을 끄면 안 됨
+	- CollisionEnable(false);를 하게 되면 RootMotion이 적용되지 않음
+	- 결이 비슷한 예로 위에서도 z 가 있는 RootMotion을 사용하기 위해선 CharacterMovementComponent의 mode를 fly로 바꿨어야 했는데
+	- 그렇기 때문에 Root Motion을 적용하려면 캐릭터의 피직스까지 세팅을 잘 해줘야 함
+
+	5. 추가로 처리한 내용은
+	- AnimInstance의 MontageEnded 델리게이트에 몽타주 끝났을 때 처리를 위한 함수를 바인드 해줬고
+	- 바인드한 이 함수는 콜리전 껐다 켠다거나 MovementMode를 바꾼다거나 ParkourType(BeginParkour()의 진입을 막는, 혹은 지금 진행중인 파쿠르가 뭔지를 알려주는 변수)
+	을 비워줌
+
+====
+0726
+====
+	1. AActor::SetActorEnableCollision(bool); 로 collision에 대한 제어가 가능한데
+	- Actor가 들고 있는 bool 변수에 대해 값을 바꿔주고
+	- 값이 바뀐 것에 대해 Actor가 들고 있는 component들에 대해 요 값이 바꼈다고 알려주는 역할을 하는 함수임
+
+	- 정확히 이 bool 값이 collision 관련해서 어떤 역할을 하는지 파악은 불가능했으나(bActorEnableCollision이라는 bool 변수가 있고 요 변수의 getter 함수를 여기저기 갖다 쓰더라)
+	- 적어도 Collision 관련 옵션을 만질 수 있는 Component들의 옵션을 건드리는 것과는 다른 결이라는 것을 파악할 수 있었음
+
+	- 그렇게 판단한 이유는 만약 캐릭터의 capsule이 NoCollision 상태가 되면 바닥과도 Collision이 일어나지 않아 중력의 영향을 받아 바닥으로 떨어지게 되는데
+	- 적어도 그런 현상은 일어나지 않았고
+	- 코드를 얕게 파봤지만 저 bool 값에 따라 Component의 Collision 관련 옵션을 사용할지 아니면 저 bool 값 그대로를 사용할지에 대한 코드가 있던 것까지는 파악했음
+
+	- UPrimitiveComponent가 들고 있는 BodyIntance라는 멤버 변수(구조체인듯?)가 Collision 관련 옵션을 담당하는 듯 싶음
+
+	- Actor가 충돌 자체에 반응하는 것과 ObjectType간에 hit일지 overlap일지 ignore일지는 또 다른 얘기인 것 같음
+
+	2. 캐릭터의 캡슐 관련해서 NoCollision으로 시작할때랑 시작하고 나서 Capsule을 NoCollision으로 바꿀 때랑 차이가 있는데
+	- 이게 버그인지 의도한건지는 모르겠으나
+	- 시작 전에 Capsule이 NoCollision으로 시작하면 중력의 영향을 받고 메쉬와는 충돌이 일어나지 않아 무한히 바닥으로 떨어지나
+	- 게임 중에 Capsule을 NoCollision으로 바꾸게 되면 그대로 가만히 멈추게 됨
+
+	3. 내 딴에 결론을 내렸는데
+	- AActor::SetActorEnableCollision(bool)로 collision을 안 하겠다고 하나 Capsule의 콜리전을 NoCollision으로 돌리나
+	외부에서 보기엔 같은 결과가 나와야 하는 것이 맞음 -> Mesh가 기본 세팅을 안 건드렸다는 가정 하에(Query Only 유지)
+
+	- Capsule을 NoCollision으로 시작하면 바닥을 뚫고 추락함
+	- AActor::SetActorCollision(false)를 ConstructionScript에서 불러도 무한히 추락함
+
+	- 하지만 BeginPlay에서 Capsule을 NoCollision으로 바꾸면 제자리에 멈춤
+	- 마찬가지로 BeginPlay에서 AActor::SetActorCollision(false)를 부르면 제자리에 멈춤
+
+	- 결론 : 캐릭터의 경우 ConstructionScript를 포함한 이전에 Collision을 안 하겠다라고 했을 경우 우리가 의도한 결과를 얻을 수 있으나
+	적어도 BeginPlay 이후에서 Collision 관련 옵션을 NoCollision으로 바꾼다고 했을 때 우리가 의도한 결과가 나오지 않을 수 있음
+
+	4. 에셋의 래퍼런스 경로에서
+	- Game은 환경변수로 설정 된 프로젝트의 Content 폴더를 의미하고
+	- 마지막에 에셋의 이름을 찍기 전에 . 전에는 패키지 이름인데
+	- 패키지란 ? -> 에셋이 여러개여도 하나의 파일로 이루어져 있을 수 있음
+
+	- 추가로 '' 랑 앞에 어떤 타입인지를 알려주는 문자를 빼도 되긴하지만 안 되는 경우가 있으니 풀네임으로 적도록 합시다
+
+	5. IK를 하기 위해
+	- AnimInstance에 발에서부터 바닥으로 트레이스 하기 위해 FName으로 구성 된 양 발 뼈 이름을 가진 변수 2개를 선언해 둠
+
+====
+0727
+====
+	1. void TraceForIK(FName const& Bone, float& Distance, FRotator& Rotator) const;
+	- Bone을 받아서 Distance랑 Rotator를 수정 반환할거라는 것을 함수 원형만 보더라도 알 수 있음
+
+	2. AnimInstance의 GetOwningComponent()는 대체로 SkeletalMesh임
+	
+	3. USceneComponent::GetSocketLocation(FName);
+	- 소켓의 이름(FName)을 받아 그 위치를 돌려주는 함수임
+	- 소켓이 넓은 의미를 가지고 있어 소켓 뿐만 아니라 Bone의 이름을 넘겨주게 되면 Bone의 위치도 돌려줄 수 있음
+	- USceneComponent::GetBoneLocation(FName) : 함수 이름이 거슬린다면 요런 함수도 있으니 취향껏 사용하면 됨
+
+	- 추가로 GetSocketLocation이 반환값이 FVector인데 (0,0,0)의 값이 나왔을 때 함수가 실패한건지 실제 (0,0,0)의 위치해서 그 결과가 나온건 지는 알 수 없음
+	- 에픽 분들이 함수를 간결하게 작성하기 위해 이런 예외처리는 제외하고 만든 듯 싶음
+
+	4. ANSICHAR, WIDECHAR
+	- ANSICHAR : char
+	- WIDECHAR : wchar_t
+
+	- 각각 char, wchar_t를 typedef으로 한 번 더 감싸놓은 형태라 할 수 있음
+	- FName의 경우 char를 인자로 받든 wchar_t를 인자로 받든 생성자를 다 만들어둬서 TEXT("")를 사용하여 캐릭터 자료형의 바이트를 고민하지 않아도 됨
+
+	- TEXT("")에 대응하는 클래스(?)가 맞나,, TCHAR가 있음(아마 클래스 맞을 듯, 템플릿 클래스 ?)
+
+	5. GetOwningComponent()->GetSocketLocation("Root")를 같은 의미로 쓰면
+	- GetOwningCompoennt()->GetComponentLocation();
+	- 캐릭터의 모델링은 보통 root 본의 위치와 컴포넌트(skeletal)의 위치가 동일함
+
+	6. 발에 대해 IK를 적용한다는 것이 결국 계단 같은 곳에서 다른 층계여도 각각 발이 딛고 있게끔 만들수 있기 위함인데
+	- 기본적으로 CharacterMovementComponent에 계단의 높이가 얼마나 높아야 올라갈 수 있는지를 정할 수 있는 변수가 있음 - 기본값은 45
+
+	7. 캐릭터의 MovementComp에서 다루는 내용 중 Braking Sub Step Time 이라는 옵션이 있는데
+	- Sub Step : 컴퓨팅 환경 상 움직임이 있어도 Analog한 것이 아니라 매 frame마다 텔레포트하는 방식으로 동작하게 되는데
+	이 때 속도가 너무 빨라서 벽을 뚫고 가버릴수도 있는데 이런 상황을 방지하고자 일정 시간마다 보정을 해주는 개념이라고 생각하면 됨
+	(다른 스레드라고 볼 수도 있겠으나 그걸 알기엔 Too Much)
+
+	8. 벽을 탄다 -> 다 같은 구현이 아님
+	- 덩굴을 자유롭게 타면서 이동하는 구현과
+	- 일정 간격마다 짚을 수 있는 포인트가 있다거나 하는 구현
+
+	은 다름
+
+	9. Possess가 컨트롤러가 없게 되면 캐릭터는 공중에 있어도 멈추게 되는데
+	- CharterMovementComp에 <컨트롤러가 없어도 피직스 실행>이라는 옵션이 있음
+
+	10. 경사각에 따라 가속도를 다르게 줄 수 있는 옵션도 있으나 잘 작동하는지는 모르겠다고 하심
+
+	11. 앉기(Crouch)를 제공하는 의의는
+	- Capsule의 HalfHeight를 줄여준다거나 캠 위치를 바꿔준다거나 하는 동작을 제공한다는 것에 의의가 있음
+
+	12. 1번에서 언급한 함수를 마저 얘기하면
+	- 우리는 결국 Distance랑 Rotator를 값을 채워서 반환해주어야 하는데
+
+	Distance = Result.Location.Z - Root.Z;
+	
+	float const Roll = +UKismetMathLibrary::DegAtan2(Result.Normal.Y, Result.Normal.Z);
+	float const Pitch = -UKismetMathLibrary::DegAtan2(Result.Normal.X, Result.Normal.Z);
+
+	Rotator = {Pitch, 0, Roll};
+
+	- Distance는 차렷한 자세를 기준으로 그 발의 위치에서부터 땅이 어딨는지를 나타냄 -> Distance가 (-)라면 땅이 발보다 밑에 있고 (+)라면 땅이 발보다 위에 있음
+	
+	- DegAtan2 : Degree, Tangent 역함수, 인자는 2개의 의미
+
+	- Rotator를 만드는 의의를 먼저 생각하면 땅이 경사진 땅이라면 발바닥과 땅이 닿으려면 발바닥이 그만큼 돌아있어야 함
+	- 결국 발이 땅과 일치하게 만드려면 땅의 Rotator만큼 돌려야 함
+	- 결국 위의 Rotator는 땅이 얼만큼 경사져 있나를 알려주는 건데
+
+	Roll은 Y/Z에 대해 Tanget 역함수를 취한거고
+	Pitch는 X/Z에 대해 Tanget 역함수를 취한라 할 수 있는데
+
+	일단 왼손을 들고 언리얼의 축을 만들게 되면 검지가 z축, 중지가 x축, 엄지가 y축이라 할 때
+	검지의 끝에서 중지, 엄지의 끝으로 가상의 선을 긋게 됐을 때 각각 그 선과 Z축이 이루는 각(위에서 구한 Roll, Pitch)이라 할 수 있겠음
+
+	13. 언리얼의 축은 왼손을 사용하여 표현할 수 있는데 일반적인 좌표계와 비교했을 때 어떻게 돌리고 돌려도 일치시킬 수 없음
+	- 어떻게 돌리고 돌려서 X축과 Z축을 일치시키게 됐을 떄 Y축을 반전시켜야만 언리얼의 축과 일치하게 되는데 이것이 Pitch가 Minus여야 하는 이유임
+	- 이 개념이 Controller에서 Pitch Scale이 기본 값이 -2.5 였던 것과도 연결되는 개념임
+
+	14. Actor를 월드에 배치하고 E를 눌러 Rotator를 바꾸는 모드로 전환하고
+	- 각 축을 오른쪽으로 돌려봤을 때 X, Z축은 +로 변하는 것을 볼 수 있으나 Y축은 -로 변하는 것을 볼 수 있음
+
+====
+0728
+====
+	1. 그동안 당연하게 Cross를 하고 나면 왼손을 들고 검지가 첫 번째 벡터, 중지가 두 번재 벡터, 엄지가 Cross의 결과로 생각했었으나
+	- 이것이 UE가 왼손 좌표계여서 가능했던 것이고
+	- 이것은 수학적으로 벡터의 Cross를 하고 나온 결과와는 정반대의 결과인 것
+	
+	- 오른쪽에 있다라는 판별이 수학적으론 그 결과의 벡터가 z가 마이너스가 나오는데에 비해
+	- 오른쪽에 있다라는 판별이 UE에선 벡터의 z가 플러스가 나옴
+
+	2. 추가로 왼손좌표계는 D3D, 언리얼, 유니티에서 쓰고 있으며
+	- 오른손 좌표계는 다른 그래픽 라이브러리, OpenGL, 수학의 좌표계 등에서 쓰임
+
+	3. 결론적으로 수학 좌표계와 언리얼 좌표계는 x,y,z축 중 하나가 축이 반전되어 있는 것이고
+	이런 점을 고려하여 수식에 적용해주어야 함(예를 들면 DegAtan2로 Rotator를 구하게 된다면 pitch가 마이너스)
+
+	4. 땅의 법선벡터에 대해 DegAtan을 하게 되는 것이고 땅의 법선벡터를 기준으로 땅을 상상하게 됐을 때 
+	- Roll은 회전과 DegAtan의 결과 각이 같으나
+	- Pitch는 부호가 바꼈다는 것을 결과론적으로는 계산해 볼 수 있음
+
+	5. FInterpTo, RInterpTo의 cpp를 까봤을 때
+	- DeltaSeconds, InterpSpeed의 값이 Start -> Target을 갈 때 몇 퍼센트를 향할지를 0 ~ 1 사이 만큼으로 Clamp하고 있었음
+	- DeltaSeconds * InterpSpeed 만큼을 0 ~ 1로 Clamp하던데 
+	- Deltaseconds를 60hz기준으로 생각하고 interpspeed를 대략적으로 정하게 되면 원하는 움직임을 만들 수 있을 것,, 걍 여러번 테스트하자
+
+	- 이것만 알면 됨 -> interp는 tick 단위로 계산할 경우 부드러운 움직임을 만들기 위해 사용하고
+	그 부드러운 움직임은 start -> target 의 차이에서 몇%에 해당하는 비율만큼 계산 한 번 당 줄어드는 거임(처음 빠른 움직임 -> 점점 느려지는 이유)
+	start == target이 거의 차이나지 않을 만큼 가까워졌을 경우엔 interp 내부적으로도 return 시키는 로직이 있음
+
+====
+0731
+====
+	1. 애님 인스턴스는 프리뷰에 적용된 인스턴스가 있기 때문에 2개처럼 보일 수가 있음
+	- Try Get Pawn Owner가 유효한지 체크하면 우리꺼만 체크 가능
+
+	2. 본 트랜스폼(변경), 2 본 IK 는 컴포넌트 공간에서 변환해야 함
+	- 기본 로컬 공간에서 애니메이션을 만들게 되는데 위 2노드를 사용하려면 로컬 <-> 컴포넌트, 컴포넌트 <-> 로컬 변환이 필요함
+
+	- 로컬은 스켈레톤 에디터에서 볼 수 있는 공간(각 뼈마다 부모에 상대적인)이고 컴포넌트는 스켈레탈 메쉬 컴포넌트를 의미함(스켈레탈 메쉬의 트랜스폼이 반영된)
+
+	3. 가상 본을 본 트랜스폼으로 옮겨놓고 옮겨진 가상본을 2본IK에 적용해 줄 것임
+
+	4. 본 트랜스폼(변경)의 속성
+	- Translation Mode : Ignore, Replace Existing, Add to Existing
+	- Translation Space : World Space, Component Space, Parent Bone Space, Bone Space
+
+	- Add to Existing, World Space를 골랐는데 각각 이유는 기존 값에서 더해진 값을 쓰는 것이고 Bone Space로 처리할 수도 있었으나 뼈가 만들어지길 축이 통일되지 않게 만들어져서
+	어쩔수 없이 World Space를 사용
