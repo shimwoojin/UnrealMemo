@@ -166,6 +166,7 @@
     <ClInclude Include="Class_Month\August\0801.h" />
     <ClInclude Include="Class_Month\August\0807.h" />
     <ClInclude Include="Class_Month\August\0808.h" />
+    <ClInclude Include="Class_Month\August\0809.h" />
     <ClInclude Include="Class_Month\July\0703.h" />
     <ClInclude Include="Class_Month\July\0704.h" />
     <ClInclude Include="Class_Month\July\0705.h" />
