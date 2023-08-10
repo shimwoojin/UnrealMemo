@@ -144,6 +144,7 @@
     <Text Include="TextFiles\5월_언리얼수업정리.txt" />
     <Text Include="TextFiles\6월_언리얼수업정리.txt" />
     <Text Include="TextFiles\7월_언리얼수업정리.txt" />
+    <Text Include="TextFiles\8월_언리얼수업정리.txt" />
     <Text Include="TextFiles\에셋정리.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +168,7 @@
     <ClInclude Include="Class_Month\August\0807.h" />
     <ClInclude Include="Class_Month\August\0808.h" />
     <ClInclude Include="Class_Month\August\0809.h" />
+    <ClInclude Include="Class_Month\August\0810.h" />
     <ClInclude Include="Class_Month\July\0703.h" />
     <ClInclude Include="Class_Month\July\0704.h" />
     <ClInclude Include="Class_Month\July\0705.h" />
