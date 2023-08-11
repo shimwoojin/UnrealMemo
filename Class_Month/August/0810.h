@@ -1,8 +1,9 @@
 #pragma once
 /*
 	1. SetupAttachment로 생성자에서 누가 누구의 부모 컴포넌트가 될지를 정하는 경우가 대부분인데 예외가 있음
-	- Mesh 계열에서 소켓의 위치로 attach 하려는 경우 SetupAttachment로 불가능함
-	- 이 때 사용할 수 있는 함수가 AttachToComponent이고
+	- 생성자에서 처리하기엔 Socket의 이름을 블프에서 설정해주기에 생성자에선 socket의 이름을 미리 알 수 없음
+
+	- 생성자가 아닌 곳에서 Attach하는 함수는 AttachToComponent이고
 	- 이 함수의 처리 위치는 OnConstruction으로 잡게 됨
 
 	- 생성자가 아닌 OnConstruction인 이유가 있는데 생성자가 적용되는 시점에서 SkeletalMeshComponent에 SkeletalMesh가 적용이 안 되어 있을 수 있고
