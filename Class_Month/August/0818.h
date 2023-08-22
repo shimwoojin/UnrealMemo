@@ -12,7 +12,7 @@
 	EFireMode FireMode = FireModes[0];
 
 	//단발, 연발 교체 시
-	FireMode = FireModes[(FimeModes.Fina(FireMode) + 1) % FireModes.Num()];
+	FireMode = FireModes[(FimeModes.Find(FireMode) + 1) % FireModes.Num()];
 
 	- enum의 순서를 맞추거나 FireModes 배열에 들어갈 원소의 순서에 영향을 받을 수 있는 점은 유의해야 함
 
